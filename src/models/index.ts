@@ -7,6 +7,9 @@ export const sequelize = new Sequelize(
 		host: DB_CONFIG.HOST,
 		dialect: DB_CONFIG.dialect,
 		pool: DB_CONFIG.pool,
-		logging: false,
+		logging: DB_CONFIG.DEBUG ? console.log : false,
 	}
 );
+
+// Import models
+export { User, Class } from './user.models';

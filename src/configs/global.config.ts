@@ -30,6 +30,7 @@ interface DB_CONFIG_INTERFACE {
     HOST: string,
     USER: string,
     PASSWORD: string,
+    DEBUG: boolean,
     dialect: Dialect,
     pool: object,
 }
@@ -44,6 +45,7 @@ export const DB_CONFIG: DB_CONFIG_INTERFACE = {
     HOST: LOCAL_CONFIG.DB_CONFIG.HOST || 'localhost',
     USER: LOCAL_CONFIG.DB_CONFIG.USER || 'root',
     PASSWORD: LOCAL_CONFIG.DB_CONFIG.PASSWORD || '',
+    DEBUG: LOCAL_CONFIG.DB_CONFIG.DEBUG || false,
     dialect: 'mysql',
     pool: {
         max: 5,
