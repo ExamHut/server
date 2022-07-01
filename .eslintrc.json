@@ -17,6 +17,7 @@
         "max-nested-callbacks": ["error", 3],
         "max-depth": ["warn", 4],
         "no-trailing-spaces": ["error", { "ignoreComments": true }],
-        "comma-dangle": ["error", "always-multiline"]
+        "comma-dangle": ["error", "always-multiline"],
+        "semi": "error"
     }
 }

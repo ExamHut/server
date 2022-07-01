@@ -13,3 +13,4 @@ export const sequelize = new Sequelize(
 
 // Import models
 export { User, Class } from './user.models';
+export { Contest } from './contest.models';
