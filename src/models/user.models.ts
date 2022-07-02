@@ -52,7 +52,7 @@ Class.init({
 }, {
     sequelize,
     timestamps: false,
-})
+});
 
 class UserClass extends Model {}
 

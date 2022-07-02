@@ -38,7 +38,7 @@ interface DB_CONFIG_INTERFACE {
 export const HOST_CONFIG = {
     HOST: LOCAL_CONFIG.HOST_CONFIG.HOST || 'localhost',
     PORT: LOCAL_CONFIG.HOST_CONFIG.PORT || 8080,
-}
+};
 
 export const DB_CONFIG: DB_CONFIG_INTERFACE = {
     NAME: LOCAL_CONFIG.DB_CONFIG.NAME || 'vulcan',
