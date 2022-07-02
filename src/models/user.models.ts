@@ -54,14 +54,14 @@ Class.init({
     timestamps: false,
 });
 
-class UserClass extends Model {}
+class UserClassJoin extends Model {}
 
-UserClass.init({}, {
+UserClassJoin.init({}, {
     sequelize,
     timestamps: false,
     tableName: 'UserClass',
 });
 
 // Setup associations
-User.belongsToMany(Class, { through: 'UserClass' });
-Class.belongsToMany(User, { through: 'UserClass' });
+User.belongsToMany(Class, { through: 'UserClassJoin' });
+Class.belongsToMany(User, { through: 'UserClassJoin' });
