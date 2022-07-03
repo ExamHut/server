@@ -62,6 +62,6 @@ UserClassJoin.init({}, {
     tableName: 'UserClass',
 });
 
-// Setup associations
+// Relationships
 User.belongsToMany(Class, { through: 'UserClassJoin' });
 Class.belongsToMany(User, { through: 'UserClassJoin' });

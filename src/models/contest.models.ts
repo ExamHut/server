@@ -33,5 +33,37 @@ Contest.init({
     sequelize,
 });
 
+class ContestParticipation extends Model {}
+
+ContestParticipation.init({
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+    },
+    points: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        validate: {
+            min: -1, // In case the contestant is disqualified
+        },
+    },
+    participateCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+    },
+    disqualified: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
+},{
+    sequelize,
+});
+
+// Relationships
 Contest.belongsTo(User, { as: 'author' });
 Contest.belongsTo(Class, { as: 'class' });
+
+ContestParticipation.belongsTo(User, { as: 'user' });
+ContestParticipation.belongsTo(Contest, { as: 'contest' });
