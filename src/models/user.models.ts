@@ -2,7 +2,13 @@ import {  DataTypes, Model } from 'sequelize';
 
 import { sequelize } from '@vulcan/models';
 
-export class User extends Model {}
+export class User extends Model {
+    declare id: number;
+    declare username: string;
+    declare name: string;
+    declare email: string;
+    declare password: string;
+}
 
 User.init({
     id: {
@@ -33,7 +39,11 @@ User.init({
     timestamps: false,
 });
 
-export class Class extends Model {}
+export class Class extends Model {
+    declare id: number;
+    declare code: string;
+    declare name: string;
+}
 
 Class.init({
     id: {

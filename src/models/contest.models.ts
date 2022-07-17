@@ -2,12 +2,19 @@ import {  DataTypes, Model } from 'sequelize';
 
 import { sequelize, User, Class } from '@vulcan/models';
 
-export class Contest extends Model {}
+export class Contest extends Model {
+    declare id: number;
+    declare name: string;
+    declare description: string;
+    declare startDate: Date;
+    declare endDate: Date;
+}
 
 Contest.init({
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
+        autoIncrement: true,
     },
     code: {
         type: DataTypes.STRING,
@@ -33,12 +40,16 @@ Contest.init({
     sequelize,
 });
 
-class ContestParticipation extends Model {}
+class ContestParticipation extends Model {
+    declare id: number;
+    declare contestId: number;
+}
 
 ContestParticipation.init({
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
+        autoIncrement: true,
     },
     points: {
         type: DataTypes.FLOAT,

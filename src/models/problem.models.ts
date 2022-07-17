@@ -42,8 +42,8 @@ ContestProblem.init({
     },
     points: {
         type: DataTypes.INTEGER,
-        allowNull: false
-    }
+        allowNull: false,
+    },
 }, {
     sequelize,
 });
