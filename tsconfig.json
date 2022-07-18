@@ -21,7 +21,7 @@
             "@vulcan/controllers": ["src/controllers/index"],
             "@vulcan/models": ["src/models/index"],
             "@vulcan/services/*": ["src/services/*"],
-            "@vulcan/routes": ["src/routes/index"],
+            "@vulcan/routes": ["src/routes.ts"],
         },
         "outDir": "dist",
         "forceConsistentCasingInFileNames": true,
