@@ -16,7 +16,7 @@
         "baseUrl": ".",
         "paths": {
             "@vulcan/configs/*": ["src/configs/*"],
-            "@vulcan/utils/*": ["src/utils/*"],
+            "@vulcan/utils": ["src/utils.ts"],
             "@vulcan/middlewares": ["src/middlewares/index"],
             "@vulcan/controllers": ["src/controllers/index"],
             "@vulcan/models": ["src/models/index"],

@@ -1,4 +1,6 @@
 import {  DataTypes, Model } from 'sequelize';
+import * as bcrypt from 'bcrypt';
+
 
 import { sequelize } from '@vulcan/models';
 
@@ -8,6 +10,14 @@ export class User extends Model {
     declare name: string;
     declare email: string;
     declare password: string;
+
+    static hashPassword(password: string) : string {
+        return bcrypt.hashSync(password, 10);
+    }
+
+    verifyPassword(password: string) {
+        return bcrypt.compareSync(password, this.password);
+    }
 }
 
 User.init({
@@ -37,6 +47,13 @@ User.init({
 }, {
     sequelize,
     timestamps: false,
+    hooks: {
+        beforeSave: (user: User, options) => {
+            if (user.password) {
+                user.password = User.hashPassword(user.password);
+            }
+        },
+    },
 });
 
 export class Class extends Model {
