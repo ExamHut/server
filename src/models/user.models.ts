@@ -10,6 +10,7 @@ export class User extends Model {
     declare name: string;
     declare email: string;
     declare password: string;
+    declare refreshToken: string;
 
     static hashPassword(password: string) : string {
         return bcrypt.hashSync(password, 10);
@@ -44,12 +45,21 @@ User.init({
         type: DataTypes.STRING,
         allowNull: false,
     },
+    refreshToken: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
 }, {
     sequelize,
     timestamps: false,
     hooks: {
-        beforeSave: (user: User, options) => {
+        beforeCreate: (user: User, options) => {
             if (user.password) {
+                user.password = User.hashPassword(user.password);
+            }
+        },
+        beforeUpdate: (user: User, options) => {
+            if (user.changed('password')) {
                 user.password = User.hashPassword(user.password);
             }
         },
