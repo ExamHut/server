@@ -9,7 +9,11 @@
         "sourceType": "module"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "import"
+    ],
+    "extends": [
+        "plugin:import/typescript"
     ],
     "rules": {
         "no-unused-vars": "off",
@@ -17,6 +21,7 @@
         "max-depth": ["warn", 4],
         "no-trailing-spaces": ["error", { "ignoreComments": true }],
         "comma-dangle": ["error", "always-multiline"],
-        "semi": "error"
+        "semi": "error",
+        "import/order": ["error"]
     }
 }

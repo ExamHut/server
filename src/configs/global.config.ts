@@ -25,6 +25,9 @@ for (const dir of CONFIG_DIR) {
     }
 }
 
+// Secret key must be set in the local configuration to avoid security issues.
+export const JWT_SECRET = LOCAL_CONFIG.JWT_SECRET || 'e5n-cj9$t7t!0p=m7xe8%a8i7a$!i_cts*oyk(j*v_wjuen3vt';
+
 interface DB_CONFIG_INTERFACE {
     NAME: string,
     HOST: string,
