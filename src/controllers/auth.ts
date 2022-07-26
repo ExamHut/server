@@ -35,8 +35,16 @@ export async function token(req: Request, res: Response) {
 
     const user = await User.findOne({ where: { id: payload.id } });
 
-    if (!user || user.refreshToken !== refresh_token) {
+    if (!user) {
         res.status(401).send('Invalid refresh token');
+        return;
+    }
+
+    // Same user, but wrong token.
+    if (user.refreshToken !== refresh_token) {
+        // Delete current token to prevent replay attacks.
+        await user.update({ refreshToken: null });
+        res.status(401).send('Invalid refresh token. Please login again.');
         return;
     }
 
