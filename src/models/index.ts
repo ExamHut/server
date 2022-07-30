@@ -1,13 +1,16 @@
 import { Sequelize } from 'sequelize';
 
-import { DB_CONFIG } from '../configs/global.config';
-
 export const sequelize = new Sequelize(
-	DB_CONFIG.NAME, DB_CONFIG.USER, DB_CONFIG.PASSWORD, {
-		host: DB_CONFIG.HOST,
-		dialect: DB_CONFIG.dialect,
-		pool: DB_CONFIG.pool,
-		logging: DB_CONFIG.DEBUG ? console.log : false,
+	process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+		host: process.env.DB_HOST,
+		dialect: "mysql",
+		pool: {
+			max: 5,
+			min: 0,
+			acquire: 30000,
+			idle: 10000,
+		},
+		logging: process.env.DB_DEBUG === "true" ? console.log : false,
 	}
 );
 

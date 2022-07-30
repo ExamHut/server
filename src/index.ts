@@ -6,7 +6,6 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 import morgan from 'morgan';
 
 import { sequelize } from './models';
-import { HOST_CONFIG, JWT_SECRET } from './configs/global.config';
 import { User } from './models';
 import { router } from './routes';
 
@@ -26,7 +25,7 @@ app.use(passport.initialize());
 // Passport local strategy
 passport.use(new Strategy({
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: JWT_SECRET,
+    secretOrKey: process.env.JWT_SECRET,
 }, (jwtPayload, done) => {
     User.findOne({ where: { id: jwtPayload.id, refreshToken: { [Op.ne]: null } } })
         .then(user => {
@@ -50,6 +49,6 @@ sequelize.sync({ force: false }).then(() => {
     console.log("Database synced.");
 });
 
-app.listen(HOST_CONFIG.PORT, HOST_CONFIG.HOST, () => {
-    console.info(`The server is running on ${HOST_CONFIG.HOST}:${HOST_CONFIG.PORT}`);
+app.listen({host: process.env.HOST, port: process.env.PORT}, () => {
+    console.info(`The server is running on ${process.env.HOST}:${process.env.PORT}`);
 });
