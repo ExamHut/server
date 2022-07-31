@@ -23,6 +23,9 @@
   },
   "homepage": "https://github.com/Revolutionary-Army-Hideout/server#readme",
   "dependencies": {
+    "@adminjs/express": "^5.0.0",
+    "@adminjs/sequelize": "^3.0.0",
+    "adminjs": "^6.0.4",
     "bcrypt": "^5.0.1",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",

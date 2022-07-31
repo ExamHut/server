@@ -134,3 +134,6 @@ dist
 
 # Local configuration
 local.config.json
+
+# Extra
+.adminjs

@@ -4,6 +4,9 @@ import { Op } from 'sequelize';
 import * as jwt from 'jsonwebtoken';
 import { ExtractJwt, Strategy } from "passport-jwt";
 import morgan from 'morgan';
+import AdminJS from 'adminjs';
+import AdminJSExpress from '@adminjs/express';
+import AdminJSSequelize from '@adminjs/sequelize';
 
 import { sequelize } from './models';
 import { User } from './models';
@@ -19,6 +22,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 // Mount router
 app.use(router);
+
+// Setup AdminJS
+AdminJS.registerAdapter(AdminJSSequelize);
+
+const adminjs = new AdminJS({
+    databases: [sequelize],
+    rootPath: '/admin',
+    branding: {
+        companyName: 'ExamHut',
+    },
+});
+
+app.use(adminjs.options.rootPath, AdminJSExpress.buildRouter(adminjs));
+
 
 // Setup passport
 app.use(passport.initialize());
