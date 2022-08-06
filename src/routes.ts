@@ -2,6 +2,7 @@ import { Router } from "express";
 import passport from "passport";
 
 import * as auth from "@vulcan/controllers/auth";
+import * as user from "@vulcan/controllers/user";
 
 export const router = Router();
 
@@ -19,3 +20,5 @@ router.get('/ping', (req, res) => {
 router.get('/ping/auth', passport.authenticate('jwt', { session: false }), (req, res) => {
     res.send('pong');
 });
+
+router.get('/user', passport.authenticate('jwt', { session: false }), user.userInfo);

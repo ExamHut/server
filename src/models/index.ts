@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 
 export const sequelize = new Sequelize(
 	process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
@@ -17,3 +17,4 @@ export const sequelize = new Sequelize(
 // Import models
 export { User, Class } from './user.models';
 export { Contest } from './contest.models';
+export { Problem } from './problem.models'

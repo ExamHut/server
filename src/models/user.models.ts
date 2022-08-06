@@ -1,57 +1,9 @@
-import {  DataTypes, Model } from 'sequelize';
 import * as bcrypt from 'bcrypt';
+import { DataType, Table, Column, Model, BelongsToMany, ForeignKey, HasMany } from 'sequelize-typescript';
 
+import { sequelize, Contest } from '@vulcan/models';
 
-import { sequelize } from '@vulcan/models';
-
-export class User extends Model {
-    declare id: number;
-    declare username: string;
-    declare name: string;
-    declare email: string;
-    declare password: string;
-    declare refreshToken: string;
-
-    static hashPassword(password: string) : string {
-        return bcrypt.hashSync(password, 10);
-    }
-
-    verifyPassword(password: string) {
-        return bcrypt.compareSync(password, this.password);
-    }
-}
-
-User.init({
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-    },
-    username: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-    },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-    },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    refreshToken: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-}, {
-    sequelize,
-    timestamps: false,
+@Table({
     hooks: {
         beforeCreate: (user: User, options) => {
             if (user.password) {
@@ -64,41 +16,93 @@ User.init({
             }
         },
     },
-});
-
-export class Class extends Model {
-    declare id: number;
-    declare code: string;
-    declare name: string;
-}
-
-Class.init({
-    id: {
-        type: DataTypes.INTEGER,
+})
+export class User extends Model {
+    @Column({
+        type: DataType.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-    },
-    code: {
-        type: DataTypes.STRING,
+    })
+    id: number;
+    
+    @Column({
+        type: DataType.STRING,
         allowNull: false,
-    },
-    name: {
-        type: DataTypes.STRING,
+        unique: true,
+    })
+    username: string;
+
+    @Column({
+        type: DataType.STRING,
         allowNull: false,
-    },
-}, {
-    sequelize,
-    timestamps: false,
-});
+    })
+    name: string;
 
-class UserClassJoin extends Model {}
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    password: string;
 
-UserClassJoin.init({}, {
-    sequelize,
-    timestamps: false,
-    tableName: 'UserClass',
-});
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+        unique: true,
+    })
+    email: string;
 
-// Relationships
-User.belongsToMany(Class, { through: 'UserClassJoin' });
-Class.belongsToMany(User, { through: 'UserClassJoin' });
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    refreshToken: string;
+
+    @BelongsToMany(() => Class, () => UserClassJoin)
+    classes: Class[];
+
+    static hashPassword(password: string) : string {
+        return bcrypt.hashSync(password, 10);
+    }
+
+    verifyPassword(password: string) {
+        return bcrypt.compareSync(password, this.password);
+    }
+}
+
+@Table
+export class Class extends Model {
+    @Column({
+        type: DataType.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    })
+    id: number;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    code: string;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    name: string;
+
+    @BelongsToMany(() => User, () => UserClassJoin)
+    users: User[];
+}
+
+@Table
+class UserClassJoin extends Model {
+    @ForeignKey(() => User)
+    @Column
+    userId: number;
+
+    @ForeignKey(() => Class)
+    @Column
+    classId: number;
+}
+
+sequelize.addModels([User, Class, UserClassJoin])
