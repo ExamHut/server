@@ -1,5 +1,4 @@
-import { DataType, Model, ForeignKey, Column, Table, BelongsTo } from 'sequelize-typescript'
-
+import { DataType, Model, ForeignKey, Column, Table, BelongsTo } from 'sequelize-typescript';
 import { sequelize, User, Class } from '@vulcan/models';
 
 @Table

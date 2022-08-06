@@ -4,9 +4,7 @@ import { Class, User } from "@vulcan/models";
 export async function userInfo(req: Request, res: Response) {
     let user = await User.findOne({
         where: { id: req.user.id },
-        include: [{
-            model: Class
-        }]
+        include: [ Class ],
     });
 
     return res.status(200).json({
@@ -16,6 +14,6 @@ export async function userInfo(req: Request, res: Response) {
         email: user.email,
         created_at: user.createdAt,
         updated_at: user.updatedAt,
-        classes: user.classes.map(c => c.id)
+        classes: user.classes.map(c => c.id),
     });
 }

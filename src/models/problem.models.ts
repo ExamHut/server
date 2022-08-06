@@ -16,7 +16,7 @@ export class Problem extends Model {
         allowNull: false,
     })
     code: string;
-    
+
     @Column({
         type: DataType.STRING,
         allowNull: false,

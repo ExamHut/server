@@ -24,7 +24,7 @@ export class User extends Model {
         autoIncrement: true,
     })
     id: number;
-    
+
     @Column({
         type: DataType.STRING,
         allowNull: false,
@@ -105,4 +105,4 @@ class UserClassJoin extends Model {
     classId: number;
 }
 
-sequelize.addModels([User, Class, UserClassJoin])
+sequelize.addModels([User, Class, UserClassJoin]);
