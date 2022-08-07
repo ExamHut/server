@@ -17,6 +17,7 @@ import { sequelize, Contest } from '@vulcan/models';
         },
     },
 })
+
 export class User extends Model {
     @Column({
         type: DataType.INTEGER,
