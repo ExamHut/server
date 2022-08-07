@@ -1,80 +1,102 @@
-import {  DataTypes, Model } from 'sequelize';
-
+import { DataType, Model, ForeignKey, Column, Table, BelongsTo } from 'sequelize-typescript';
 import { sequelize, User, Class } from '@vulcan/models';
 
+@Table
 export class Contest extends Model {
-    declare id: number;
-    declare name: string;
-    declare description: string;
-    declare startDate: Date;
-    declare endDate: Date;
-}
-
-Contest.init({
-    id: {
-        type: DataTypes.INTEGER,
+    @Column({
+        type: DataType.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-    },
-    code: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    description: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    startDate: {
-        type: DataTypes.DATE,
-        allowNull: false,
-    },
-    endDate: {
-        type: DataTypes.DATE,
-        allowNull: false,
-    },
-}, {
-    sequelize,
-});
+    })
+    id: number;
 
-class ContestParticipation extends Model {
-    declare id: number;
-    declare contestId: number;
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    code: string;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    name: string;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    description: string;
+
+    @Column({
+        type: DataType.DATE,
+        allowNull: false,
+    })
+    startDate: Date;
+
+    @Column({
+        type: DataType.DATE,
+        allowNull: false,
+    })
+    endDate: Date;
+
+    @ForeignKey(() => User)
+    @Column
+    authorId: number;
+
+    @ForeignKey(() => Class)
+    @Column
+    classId: number;
+
+    @BelongsTo(() => User)
+    author: User;
+
+    @BelongsTo(() => Class)
+    class: Class;
 }
 
-ContestParticipation.init({
-    id: {
-        type: DataTypes.INTEGER,
+@Table
+export class ContestParticipation extends Model {
+    @Column({
+        type: DataType.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-    },
-    points: {
-        type: DataTypes.FLOAT,
+    })
+    id: number;
+
+    @Column({
+        type: DataType.FLOAT,
         allowNull: false,
-        validate: {
-            min: -1, // In case the contestant is disqualified
-        },
-    },
-    participateCount: {
-        type: DataTypes.INTEGER,
+    })
+    points: number;
+
+    @Column({
+        type: DataType.INTEGER,
         allowNull: false,
         defaultValue: 0,
-    },
-    disqualified: {
-        type: DataTypes.BOOLEAN,
+    })
+    participateCount: number;
+
+    @Column({
+        type: DataType.BOOLEAN,
         allowNull: false,
         defaultValue: false,
-    },
-},{
-    sequelize,
-});
+    })
+    disqualified: boolean;
 
-// Relationships
-Contest.belongsTo(User, { as: 'author' });
-Contest.belongsTo(Class, { as: 'class' });
+    @ForeignKey(() => User)
+    @Column
+    userId: number;
 
-ContestParticipation.belongsTo(User, { as: 'user' });
-ContestParticipation.belongsTo(Contest, { as: 'contest' });
+    @ForeignKey(() => Contest)
+    @Column
+    contestId: number;
+
+    @BelongsTo(() => User)
+    user: User;
+
+    @BelongsTo(() => Contest)
+    contest: Contest;
+}
+
+sequelize.addModels([Contest, ContestParticipation]);

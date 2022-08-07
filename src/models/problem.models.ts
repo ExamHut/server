@@ -1,52 +1,75 @@
-import {  DataTypes, Model } from 'sequelize';
+import { DataType, Model, Table, Column, ForeignKey, BelongsTo } from 'sequelize-typescript';
 
 import { sequelize, Contest } from '@vulcan/models';
 
-export class Problem extends Model {}
-
-Problem.init({
-    id: {
-        type: DataTypes.INTEGER,
+@Table
+export class Problem extends Model {
+    @Column({
+        type: DataType.INTEGER,
         primaryKey: true,
-    },
-    code: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    statementFile: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    timeLimit: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
-    },
-    memoryLimit: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
-}, {
-    sequelize,
-});
+        autoIncrement: true,
+    })
+    id: number;
 
-export class ContestProblem extends Model {}
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    code: string;
 
-ContestProblem.init({
-    id: {
-        type: DataTypes.INTEGER,
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    name: string;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    statementFile: string;
+
+    @Column({
+        type: DataType.FLOAT,
+        allowNull: false,
+    })
+    timeLimit: number;
+
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: false,
+    })
+    memoryLimit: number;
+}
+
+@Table
+export class ContestProblem extends Model {
+    @Column({
+        type: DataType.INTEGER,
         primaryKey: true,
-    },
-    points: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
-}, {
-    sequelize,
-});
+        autoIncrement: true,
+    })
+    id: number;
 
-ContestProblem.belongsTo(Problem, { as: "problem" });
-ContestProblem.belongsTo(Contest, { as: "contest" });
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: false,
+    })
+    points: number;
+
+    @ForeignKey(() => Problem)
+    @Column
+    problemId: number;
+
+    @ForeignKey(() => Contest)
+    @Column
+    contestId: number;
+
+    @BelongsTo(() => Problem)
+    problem: Problem;
+
+    @BelongsTo(() => Contest)
+    contest: Contest;
+}
+
+sequelize.addModels([Problem, ContestProblem]);

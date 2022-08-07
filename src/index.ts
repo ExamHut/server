@@ -50,7 +50,7 @@ passport.use(new Strategy({
         });
 }));
 
-sequelize.sync({ force: false }).then(() => {
+sequelize.sync({ force: process.env.DB_FORCED_SYNC === 'true' }).then(() => {
     console.log("Database synced.");
 });
 
