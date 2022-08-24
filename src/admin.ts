@@ -1,13 +1,12 @@
 import AdminJS from 'adminjs';
-import AdminJSExpress from '@adminjs/express';
-import AdminJSSequelize from '@adminjs/sequelize';
+import { Database, Resource } from '@adminjs/typeorm';
 
-import { sequelize } from '@vulcan/models';
+import { AppDataSource } from '@vulcan/models';
 
-AdminJS.registerAdapter(AdminJSSequelize);
+AdminJS.registerAdapter({ Database, Resource });
 
 export const adminjs = new AdminJS({
-    databases: [sequelize],
+    databases: [AppDataSource],
     rootPath: '/admin',
     branding: {
         companyName: 'ExamHut',

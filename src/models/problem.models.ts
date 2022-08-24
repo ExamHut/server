@@ -1,75 +1,49 @@
-import { DataType, Model, Table, Column, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToMany, ManyToOne } from "typeorm";
 
-import { sequelize, Contest } from '@vulcan/models';
+import { Contest } from "@vulcan/models";
 
-@Table
-export class Problem extends Model {
-    @Column({
-        type: DataType.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-    })
+@Entity()
+export class Problem extends BaseEntity {
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        length: 64,
+        unique: true,
     })
     code: string;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        length: 128,
     })
     name: string;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        nullable: true,
     })
     statementFile: string;
 
     @Column({
-        type: DataType.FLOAT,
-        allowNull: false,
+        type: "float",
+        precision: 3,
     })
     timeLimit: number;
 
-    @Column({
-        type: DataType.INTEGER,
-        allowNull: false,
-    })
+    @Column()
     memoryLimit: number;
 }
 
-@Table
-export class ContestProblem extends Model {
-    @Column({
-        type: DataType.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-    })
+@Entity()
+export class ContestProblem extends BaseEntity {
+    @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({
-        type: DataType.INTEGER,
-        allowNull: false,
-    })
+    @Column()
     points: number;
 
-    @ForeignKey(() => Problem)
-    @Column
-    problemId: number;
-
-    @ForeignKey(() => Contest)
-    @Column
-    contestId: number;
-
-    @BelongsTo(() => Problem)
+    @ManyToOne('Problem')
     problem: Problem;
 
-    @BelongsTo(() => Contest)
+    @ManyToOne('Contest')
     contest: Contest;
 }
-
-sequelize.addModels([Problem, ContestProblem]);

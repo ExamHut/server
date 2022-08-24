@@ -1,67 +1,54 @@
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, BeforeInsert, BeforeUpdate, ManyToMany, JoinTable } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { DataType, Table, Column, Model, BelongsToMany, ForeignKey, HasMany } from 'sequelize-typescript';
 
-import { sequelize, Contest } from '@vulcan/models';
-
-@Table({
-    hooks: {
-        beforeCreate: (user: User, options) => {
-            if (user.password) {
-                user.password = User.hashPassword(user.password);
-            }
-        },
-        beforeUpdate: (user: User, options) => {
-            if (user.changed('password')) {
-                user.password = User.hashPassword(user.password);
-            }
-        },
-    },
-})
-
-export class User extends Model {
-    @Column({
-        type: DataType.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-    })
+@Entity()
+export class User extends BaseEntity {
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        length: 64,
         unique: true,
     })
     username: string;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        length: 128,
     })
     name: string;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        length: 256,
     })
     password: string;
+    public PASSWORD_ACTUAL_LENGTH = 64;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        length: 128,
         unique: true,
     })
     email: string;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        length: 128,
+        nullable: true,
     })
     refreshToken: string;
 
-    @BelongsToMany(() => Class, () => UserClassJoin)
+    @ManyToMany('Class')
+    @JoinTable()
     classes: Class[];
 
-    static hashPassword(password: string) : string {
+    @BeforeInsert()
+    @BeforeUpdate()
+    validatePassword() {
+        if (this.password.length < 8 || this.password.length > this.PASSWORD_ACTUAL_LENGTH) {
+            throw new TypeError("Password must be between 8 and " + this.PASSWORD_ACTUAL_LENGTH + " characters.");
+        }
+        this.password = User.hashPassword(this.password);
+    }
+
+    static hashPassword(password: string) {
         return bcrypt.hashSync(password, 10);
     }
 
@@ -70,40 +57,19 @@ export class User extends Model {
     }
 }
 
-@Table
-export class Class extends Model {
-    @Column({
-        type: DataType.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-    })
+@Entity()
+export class Class extends BaseEntity {
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        length: 64,
+        unique: true,
     })
     code: string;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        length: 256,
     })
     name: string;
-
-    @BelongsToMany(() => User, () => UserClassJoin)
-    users: User[];
 }
-
-@Table
-class UserClassJoin extends Model {
-    @ForeignKey(() => User)
-    @Column
-    userId: number;
-
-    @ForeignKey(() => Class)
-    @Column
-    classId: number;
-}
-
-sequelize.addModels([User, Class, UserClassJoin]);

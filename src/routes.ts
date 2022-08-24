@@ -11,6 +11,9 @@ router.post("/login", auth.login);
 router.post("/token", auth.token);
 router.delete("/logout", passport.authenticate('jwt', { session: false }), auth.logout);
 
+// User
+router.get('/user', passport.authenticate('jwt', { session: false }), user.userInfo);
+
 // Demo route: ping-pong
 router.get('/ping', (req, res) => {
     res.send('pong');
@@ -20,5 +23,3 @@ router.get('/ping', (req, res) => {
 router.get('/ping/auth', passport.authenticate('jwt', { session: false }), (req, res) => {
     res.send('pong');
 });
-
-router.get('/user', passport.authenticate('jwt', { session: false }), user.userInfo);

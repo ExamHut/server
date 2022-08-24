@@ -2,11 +2,11 @@ import * as jwt from 'jsonwebtoken';
 
 import { Request, Response } from 'express';
 
-import { User } from "@vulcan/models";
+import { AppDataSource, User } from "@vulcan/models";
 
 export async function login(req: Request, res: Response) {
     const { username, password } = req.body;
-    const user = await User.findOne({ where: { username: username } });
+    const user = await User.findOneBy({ username: username });
 
     if (!user || !user.verifyPassword(password)) {
         res.status(401).send('Invalid username or password');
@@ -16,7 +16,7 @@ export async function login(req: Request, res: Response) {
     const access_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
     const refresh_token = jwt.sign({ id: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN });
 
-    await user.update({ refreshToken: refresh_token });
+    await User.update({ refreshToken: refresh_token }, user);
 
     res.status(200).json({
         access_token: access_token,
@@ -33,7 +33,7 @@ export async function token(req: Request, res: Response) {
         return;
     }
 
-    const user = await User.findOne({ where: { id: payload.id } });
+    const user = await User.findOneBy({ id: payload.id });
 
     if (!user) {
         res.status(401).send('Invalid refresh token');
@@ -43,7 +43,7 @@ export async function token(req: Request, res: Response) {
     // Same user, but wrong token.
     if (user.refreshToken !== refresh_token) {
         // Delete current token to prevent replay attacks.
-        await user.update({ refreshToken: null });
+        await User.update({ refreshToken: null }, user);
         res.status(401).send('Invalid refresh token. Please login again.');
         return;
     }
@@ -51,7 +51,7 @@ export async function token(req: Request, res: Response) {
     const access_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
     const new_refresh_token = jwt.sign({ id: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN });
 
-    await user.update({ refreshToken: refresh_token });
+    await User.update({ refreshToken: refresh_token }, user);
 
     res.status(200).json({
         access_token: access_token,

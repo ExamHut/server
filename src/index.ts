@@ -1,15 +1,13 @@
 import express from 'express';
 import passport from 'passport';
-import { Op } from 'sequelize';
-import * as jwt from 'jsonwebtoken';
 import { ExtractJwt, Strategy } from "passport-jwt";
 import morgan from 'morgan';
-import AdminJSExpress from '@adminjs/express';
+// import AdminJSExpress from '@adminjs/express';
+// import AdminJS from 'adminjs';
+// import { Database, Resource } from '@adminjs/typeorm';
 
-import { adminjs } from './admin';
-import { sequelize } from './models';
-import { User } from './models';
-import { router } from './routes';
+import { AppDataSource, User } from "@vulcan/models";
+import { router } from '@vulcan/routes';
 
 const app = express();
 
@@ -22,38 +20,42 @@ app.use(morgan('dev'));
 // Mount router
 app.use(router);
 
-// Setup AdminJS
-app.use(adminjs.options.rootPath, AdminJSExpress.buildRouter(adminjs));
-
 // Setup passport
 app.use(passport.initialize());
 // Passport local strategy
 passport.use(new Strategy({
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.JWT_SECRET,
-}, (jwtPayload, done) => {
-    User.findOne({ where: { id: jwtPayload.id, refreshToken: { [Op.ne]: null } } })
-        .then(user => {
-            if (user) {
-                const refresh_payload = jwt.decode(user.refreshToken) as jwt.JwtPayload;
-                // Refresh token is outdated. Delete (logout).
-                if (refresh_payload.exp < Date.now()) {
-                    user.refreshToken = null;
-                    user.save();
-                    return done(null, false, "Refresh token is outdated. Please login again.");
-                }
-                return done(null, user);
-            }
-            return done(null, false);
-        }).catch(err => {
-            return done(err, false);
-        });
+}, async (jwtPayload, done) => {
+    const user = await User.findOneBy({id: jwtPayload.sub}).catch((err) => {
+        return done(err, false);
+    });
+
+    if (jwtPayload.exp < Date.now()) {
+        return done(null, false);
+    }
+
+    return user ? done(null, user) : done(null, false);
 }));
 
-sequelize.sync({ force: process.env.DB_FORCED_SYNC === 'true' }).then(() => {
-    console.log("Database synced.");
-});
+(async () => {
+    await AppDataSource.initialize().then(() => {
+        console.log('The database is initialized.');
+    }).catch((error) => {
+        console.log('The database failed to initialize:', error);
+    });
 
-app.listen({host: process.env.HOST, port: process.env.PORT}, () => {
-    console.info(`The server is running on ${process.env.HOST}:${process.env.PORT}`);
-});
+    // AdminJS.registerAdapter({ Database, Resource });
+    // const adminjs = new AdminJS({
+    //     databases: [AppDataSource],
+    //     rootPath: '/admin',
+    //     branding: {
+    //         companyName: 'ExamHut',
+    //     },
+    // });
+    // app.use(adminjs.options.rootPath, AdminJSExpress.buildRouter(adminjs));
+
+    app.listen({host: process.env.HOST, port: process.env.PORT}, () => {
+        console.info(`The server is running on ${process.env.HOST}:${process.env.PORT}`);
+    });
+})();

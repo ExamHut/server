@@ -1,102 +1,66 @@
-import { DataType, Model, ForeignKey, Column, Table, BelongsTo } from 'sequelize-typescript';
-import { sequelize, User, Class } from '@vulcan/models';
+import { Entity, Column, BaseEntity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Table
-export class Contest extends Model {
-    @Column({
-        type: DataType.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-    })
+import { User, Class } from "@vulcan/models";
+
+@Entity()
+export class Contest extends BaseEntity {
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        length: 64,
+        unique: true,
     })
     code: string;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        length: 256,
     })
     name: string;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        type: "text",
     })
     description: string;
 
     @Column({
-        type: DataType.DATE,
-        allowNull: false,
+        type: "datetime",
     })
     startDate: Date;
 
     @Column({
-        type: DataType.DATE,
-        allowNull: false,
+        type: "datetime",
     })
     endDate: Date;
 
-    @ForeignKey(() => User)
-    @Column
-    authorId: number;
-
-    @ForeignKey(() => Class)
-    @Column
-    classId: number;
-
-    @BelongsTo(() => User)
+    @ManyToOne('User')
     author: User;
 
-    @BelongsTo(() => Class)
+    @ManyToOne('Class')
     class: Class;
 }
 
-@Table
-export class ContestParticipation extends Model {
-    @Column({
-        type: DataType.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-    })
+@Entity()
+export class ContestParticipation extends BaseEntity {
+    @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({
-        type: DataType.FLOAT,
-        allowNull: false,
-    })
+    @Column()
     points: number;
 
     @Column({
-        type: DataType.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
+        default: 0,
     })
     participateCount: number;
 
     @Column({
-        type: DataType.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
+        default: false,
     })
     disqualified: boolean;
 
-    @ForeignKey(() => User)
-    @Column
-    userId: number;
-
-    @ForeignKey(() => Contest)
-    @Column
-    contestId: number;
-
-    @BelongsTo(() => User)
+    @ManyToOne('User')
     user: User;
 
-    @BelongsTo(() => Contest)
+    @ManyToOne('Contest')
     contest: Contest;
 }
-
-sequelize.addModels([Contest, ContestParticipation]);
