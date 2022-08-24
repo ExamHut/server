@@ -2,9 +2,6 @@ import express from 'express';
 import passport from 'passport';
 import { ExtractJwt, Strategy } from "passport-jwt";
 import morgan from 'morgan';
-// import AdminJSExpress from '@adminjs/express';
-// import AdminJS from 'adminjs';
-// import { Database, Resource } from '@adminjs/typeorm';
 
 import { AppDataSource, User } from "@vulcan/models";
 import { router } from '@vulcan/routes';
@@ -44,16 +41,6 @@ passport.use(new Strategy({
     }).catch((error) => {
         console.log('The database failed to initialize:', error);
     });
-
-    // AdminJS.registerAdapter({ Database, Resource });
-    // const adminjs = new AdminJS({
-    //     databases: [AppDataSource],
-    //     rootPath: '/admin',
-    //     branding: {
-    //         companyName: 'ExamHut',
-    //     },
-    // });
-    // app.use(adminjs.options.rootPath, AdminJSExpress.buildRouter(adminjs));
 
     app.listen({host: process.env.HOST, port: process.env.PORT}, () => {
         console.info(`The server is running on ${process.env.HOST}:${process.env.PORT}`);
