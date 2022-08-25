@@ -17,9 +17,9 @@ router.delete("/logout", passport.authenticate('jwt', { session: false }), auth.
 router.get('/user', passport.authenticate('jwt', { session: false }), user.userInfo);
 
 // Problems
-router.get("/problem/:problemId", problem.problemInfo);
-router.get("/submission/:submissionId", submission.submissionInfo);
-router.get("/problem/:problemId/submissions", submission.allSubmissionInfo);
+router.get("/problem/:problemId", passport.authenticate('jwt', { session: false }), problem.problemInfo);
+router.get("/submission/:submissionId", passport.authenticate('jwt', { session: false }), submission.submissionInfo);
+router.get("/problem/:problemId/submissions", passport.authenticate('jwt', { session: false }), submission.allSubmissionInfo);
 
 // Demo route: ping-pong
 router.get('/ping', (req, res) => {
