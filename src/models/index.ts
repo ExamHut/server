@@ -20,3 +20,4 @@ export { User, Class } from './user.models';
 export { Contest, ContestParticipation } from './contest.models';
 export { Problem, ContestProblem } from './problem.models';
 export { Language, Judge, RuntimeVersion } from './runtime.models';
+export { Submission } from './submission.models';
