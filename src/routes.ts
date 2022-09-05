@@ -20,6 +20,8 @@ router.get('/user', passport.authenticate('jwt', { session: false }), user.userI
 router.get("/problem/:problemId", passport.authenticate('jwt', { session: false }), problem.problemInfo);
 router.get("/submission/:submissionId", passport.authenticate('jwt', { session: false }), submission.submissionInfo);
 router.get("/problem/:problemId/submissions", passport.authenticate('jwt', { session: false }), submission.allSubmissionInfo);
+router.post("/problem/:problemId/submit", passport.authenticate('jwt', { session: false }), submission.submit);
+router.get("/submission/:submissionId/source", passport.authenticate('jwt', { session: false }), submission.source);
 
 // Demo route: ping-pong
 router.get('/ping', (req, res) => {

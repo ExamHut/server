@@ -1,4 +1,4 @@
-import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Unique } from "typeorm";
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Unique, OneToOne, JoinColumn } from "typeorm";
 
 import { Contest, User, Problem, Language, Judge } from "@vulcan/models";
 
@@ -155,7 +155,8 @@ export class SubmissionSource extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne('Submission', { onDelete: 'CASCADE' })
+    @OneToOne('Submission', { onDelete: 'CASCADE' })
+    @JoinColumn()
     submission: Submission;
 
     @Column({
