@@ -89,6 +89,8 @@ export async function submit(req: Request, res: Response) {
             return res.status(409).json(err);
         }
 
+        console.log(req.file);
+
         const problem = await Problem.findOneBy({ id: Number(req.params.problemId) });
         const language = await Language.findOneBy({ extension: req.body.language });
         const user = req.user;
@@ -104,7 +106,9 @@ export async function submit(req: Request, res: Response) {
         submissionSource.submission = updatedSubmisison;
 
         if (language.fileOnly) {
-            const newPath = `storage/${crypto.randomUUID()}.zip`;
+            const split = req.file.filename.split('.');
+            const extension = (split.length > 1) ? ("." + split.pop()) : "";
+            const newPath = `storage/${crypto.randomUUID()}${extension}`;
             fs.rename(req.file.path, newPath, (err) => {
                 if (err) {
                     return res.status(500).json(err);
