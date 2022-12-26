@@ -134,3 +134,10 @@ dist
 
 # Local configuration
 local.config.json
+
+# Extra
+.adminjs
+.test/
+
+# Submissions for file-only problems
+storage/

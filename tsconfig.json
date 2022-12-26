@@ -3,35 +3,38 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "target": "es6",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "allowJs": false,
         "alwaysStrict": true,
         "declaration": false,
         "listEmittedFiles": true,
         "noImplicitAny": true,
         "esModuleInterop": true,
-        "emitDecoratorMetadata": false,
         "types": ["node"],
         "downlevelIteration": true,
         "incremental": false,
         "baseUrl": ".",
         "paths": {
             "@vulcan/configs/*": ["src/configs/*"],
-            "@vulcan/utils": ["src/utils/index"],
+            "@vulcan/utils": ["src/utils.ts"],
             "@vulcan/middlewares": ["src/middlewares/index"],
-            "@vulcan/controllers": ["src/controllers/index"],
+            "@vulcan/controllers/*": ["src/controllers/*"],
             "@vulcan/models": ["src/models/index"],
             "@vulcan/services/*": ["src/services/*"],
-            "@vulcan/routes": ["src/routes/index"],
+            "@vulcan/routes": ["src/routes.ts"],
         },
         "outDir": "dist",
         "forceConsistentCasingInFileNames": true,
+        "typeRoots": ["node_modules/@types/", "src/typings/"],
     },
     "include": [
         "src/**/*"
     ],
     "ts-node": {
         "require": [
-            "tsconfig-paths/register"
+            "tsconfig-paths/register",
+            "dotenv/config",
         ]
     }
 }

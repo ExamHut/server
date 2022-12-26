@@ -1,12 +1,23 @@
-import { Sequelize } from 'sequelize';
+import "reflect-metadata";
+import { DataSource } from "typeorm";
+import { User } from './user.models';
 
-import { DB_CONFIG } from '../configs/global.config';
+export const AppDataSource = new DataSource({
+    type: "mysql",
+    host: "localhost",
+    port: 3306,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    synchronize: process.env.DB_FORCED_SYNC === "true",
+    logging: false,
+    entities: [__dirname + "/**/*.models.ts"],
+    migrations: [],
+    subscribers: [],
+});
 
-export const sequelize = new Sequelize(
-	DB_CONFIG.NAME, DB_CONFIG.USER, DB_CONFIG.PASSWORD, {
-		host: DB_CONFIG.HOST,
-		dialect: DB_CONFIG.dialect,
-		pool: DB_CONFIG.pool,
-		logging: false,
-	}
-);
+export { User, Class } from './user.models';
+export { Contest, ContestParticipation, ContestSubmission } from './contest.models';
+export { Problem, ContestProblem } from './problem.models';
+export { Language, Judge, RuntimeVersion } from './runtime.models';
+export { Submission, SubmissionTestcase } from './submission.models';
