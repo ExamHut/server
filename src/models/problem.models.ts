@@ -1,6 +1,6 @@
-import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToMany, ManyToOne } from "typeorm";
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToMany, ManyToOne, JoinTable, CreateDateColumn } from "typeorm";
 
-import { Contest } from "@vulcan/models";
+import { Contest, Language } from "@vulcan/models";
 
 @Entity()
 export class Problem extends BaseEntity {
@@ -31,6 +31,38 @@ export class Problem extends BaseEntity {
 
     @Column()
     memoryLimit: number;
+
+    @Column({
+        default: false,
+    })
+    shortCircuit: boolean;
+
+    @Column({
+        type: 'float',
+    })
+    points: number;
+
+    @Column({
+        default: false,
+    })
+    partial: boolean;
+
+    @ManyToMany('Language')
+    @JoinTable()
+    allowedLanguages: Language[];
+
+    @Column({
+        default: false,
+    })
+    isPublic: boolean;
+
+    @Column({
+        default: false,
+    })
+    isManuallyManaged: boolean;
+
+    @CreateDateColumn()
+    date: Date;
 }
 
 @Entity()

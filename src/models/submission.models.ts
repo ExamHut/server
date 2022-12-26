@@ -1,6 +1,7 @@
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Unique, OneToOne, JoinColumn } from "typeorm";
 
 import { Contest, User, Problem, Language, Judge } from "@vulcan/models";
+import { judge_submission } from "src/judgeapi";
 
 @Entity()
 export class Submission extends BaseEntity {
@@ -146,8 +147,12 @@ export class Submission extends BaseEntity {
     })
     isPretested: boolean;
 
-    @ManyToOne('Contest', { onDelete: 'SET NULL' })
-    contest: Contest;
+    @OneToOne('SubmissionSource', { onDelete: 'CASCADE' })
+    source: SubmissionSource;
+
+    public judge(rejudge: boolean = false) {
+        judge_submission(this);
+    }
 }
 
 @Entity()

@@ -119,11 +119,11 @@ export class RuntimeVersion extends BaseEntity {
 
     @OneToOne('Language')
     @JoinColumn()
-    language: Language[];
+    language: Language;
 
     @OneToOne('Judge')
     @JoinColumn()
-    judge: Judge[];
+    judge: Judge;
 
     @Column({
         length: 64,
