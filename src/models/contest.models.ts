@@ -60,9 +60,6 @@ export class ContestParticipation extends BaseEntity {
 
     @ManyToOne('User')
     user: User;
-
-    @ManyToOne('Contest')
-    contest: Contest;
 }
 
 @Entity()
