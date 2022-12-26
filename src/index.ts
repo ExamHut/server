@@ -28,7 +28,8 @@ passport.use(new Strategy({
         return done(err, false);
     });
 
-    if (jwtPayload.exp < Date.now()) {
+    const MILLISECONDS_IN_A_SECOND = 1000;
+    if (jwtPayload.exp < Date.now() / MILLISECONDS_IN_A_SECOND) {
         return done(null, false);
     }
 
