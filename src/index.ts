@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import { AppDataSource, User } from "@vulcan/models";
 import { router } from '@vulcan/routes';
 
-const app = express();
+export const app = express();
 
 // Parse requests of content-type - application/json
 app.use(express.json());
