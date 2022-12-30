@@ -4,7 +4,7 @@ import multer from "multer";
 
 import { Request, Response } from 'express';
 import { Equal } from "typeorm";
-import { AppDataSource, Language, Problem, Submission, SubmissionSource, User } from "@vulcan/models";
+import { AppDataSource, ContestProblem, Language, Problem, Submission, SubmissionSource, User } from "@vulcan/models";
 
 export async function submissionInfo(req: Request, res: Response) {
     let submission = await Submission.findOne({
@@ -87,7 +87,7 @@ export async function submit(req: Request, res: Response) {
             return res.status(409).json(err);
         }
 
-        const problem = await Problem.findOneBy({ id: Equal(Number(req.params.problemId)) });
+        const problem = await ContestProblem.findOneBy({ id: Equal(Number(req.params.problemId)) });
         if (!problem) {
             return res.status(404).json({ error: "Problem not found" });
         }

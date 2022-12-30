@@ -1,6 +1,6 @@
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Unique, OneToOne, JoinColumn, Relation } from "typeorm";
 
-import { Contest, User, Problem, Language, Judge } from "@vulcan/models";
+import { Contest, User, Problem, Language, Judge, ContestProblem } from "@vulcan/models";
 import { judge_submission } from "src/judgeapi";
 
 @Entity()
@@ -62,10 +62,12 @@ export class Submission extends BaseEntity {
     id: number;
 
     @ManyToOne('User', { onDelete: 'CASCADE' })
-    user: User;
+    @JoinColumn()
+    user: Relation<User>;
 
-    @ManyToOne('Problem', { onDelete: 'CASCADE' })
-    problem: Problem;
+    @ManyToOne('ContestProblem', (problem: Relation<ContestProblem>) => problem.submissions, { onDelete: 'CASCADE' })
+    @JoinColumn()
+    problem: Relation<ContestProblem>;
 
     @CreateDateColumn()
     date: Date;

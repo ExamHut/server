@@ -3,7 +3,7 @@ import * as zlib from 'zlib';
 
 import { SocketClientTCP } from 'netlinkwrapper';
 import { pack, unpack } from 'python-struct';
-import { Submission, ContestSubmission, SubmissionTestcase } from '@vulcan/models';
+import { Submission } from '@vulcan/models';
 
 
 export function judge_request(packet: object, reply: boolean = true) {

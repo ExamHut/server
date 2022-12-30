@@ -1,4 +1,4 @@
-import { Entity, Column, BaseEntity, ManyToOne, PrimaryGeneratedColumn, OneToOne } from "typeorm";
+import { Entity, Column, BaseEntity, ManyToOne, PrimaryGeneratedColumn, OneToOne, OneToMany, Relation, Unique } from "typeorm";
 
 import { User, Class, Submission, ContestProblem } from "@vulcan/models";
 
@@ -60,27 +60,4 @@ export class ContestParticipation extends BaseEntity {
 
     @ManyToOne('User')
     user: User;
-}
-
-@Entity()
-export class ContestSubmission extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Column({ default: 0, type: "float" })
-    points: number;
-
-    @Column({
-        default: false,
-    })
-    is_presented: boolean;
-
-    @ManyToOne('ContestParticipation')
-    participation: ContestParticipation;
-
-    @OneToOne('Submission')
-    submission: Submission;
-
-    @ManyToOne('ContestProblem')
-    problem: ContestProblem;
 }

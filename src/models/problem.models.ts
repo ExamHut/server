@@ -1,6 +1,6 @@
-import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToMany, ManyToOne, JoinTable, CreateDateColumn } from "typeorm";
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToMany, ManyToOne, JoinTable, CreateDateColumn, Relation, OneToMany, Unique } from "typeorm";
 
-import { Contest, Language } from "@vulcan/models";
+import { Contest, Language, Submission } from "@vulcan/models";
 
 @Entity()
 export class Problem extends BaseEntity {
@@ -49,7 +49,7 @@ export class Problem extends BaseEntity {
 
     @ManyToMany('Language')
     @JoinTable()
-    allowedLanguages: Language[];
+    allowedLanguages: Relation<Language>[];
 
     @Column({
         default: false,
@@ -66,6 +66,7 @@ export class Problem extends BaseEntity {
 }
 
 @Entity()
+@Unique(['problem', 'contest'])
 export class ContestProblem extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
@@ -74,8 +75,11 @@ export class ContestProblem extends BaseEntity {
     points: number;
 
     @ManyToOne('Problem')
-    problem: Problem;
+    problem: Relation<Problem>;
 
     @ManyToOne('Contest')
-    contest: Contest;
+    contest: Relation<Contest>;
+
+    @OneToMany('Submission', (submission: Relation<Submission>) => submission.problem, { onDelete: 'CASCADE' })
+    submissions: Relation<Submission>[];
 }
