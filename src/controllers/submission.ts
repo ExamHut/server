@@ -3,8 +3,8 @@ import fs from "fs";
 import multer from "multer";
 
 import { Request, Response } from 'express';
-import { AppDataSource, Language, Problem, Submission, User } from "@vulcan/models";
-import { SubmissionSource } from 'src/models/submission.models';
+import { Equal } from "typeorm";
+import { AppDataSource, Language, Problem, Submission, SubmissionSource, User } from "@vulcan/models";
 
 export async function submissionInfo(req: Request, res: Response) {
     let submission = await Submission.findOne({
@@ -87,8 +87,21 @@ export async function submit(req: Request, res: Response) {
             return res.status(409).json(err);
         }
 
-        const problem = await Problem.findOneBy({ id: Number(req.params.problemId) });
-        const language = await Language.findOneBy({ extension: req.body.language });
+        const problem = await Problem.findOneBy({ id: Equal(Number(req.params.problemId)) });
+        if (!problem) {
+            return res.status(404).json({ error: "Problem not found" });
+        }
+
+        const language = await Language.findOneBy({ code: Equal(req.body.language) });
+        if (!language) {
+            return res.status(400).json({ error: `Unsupported language: ${req.body.language}` });
+        }
+
+        // Ensure that the submission does contains file/source
+        if (!req.body.source && !req.file) {
+            return res.status(400).json({ error: "No source/file found." });
+        }
+
         const user = req.user;
 
         const submission = new Submission();

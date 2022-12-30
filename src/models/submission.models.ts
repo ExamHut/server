@@ -1,4 +1,4 @@
-import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Unique, OneToOne, JoinColumn } from "typeorm";
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Unique, OneToOne, JoinColumn, Relation } from "typeorm";
 
 import { Contest, User, Problem, Language, Judge } from "@vulcan/models";
 import { judge_submission } from "src/judgeapi";
@@ -147,8 +147,8 @@ export class Submission extends BaseEntity {
     })
     isPretested: boolean;
 
-    @OneToOne('SubmissionSource', { onDelete: 'CASCADE' })
-    source: SubmissionSource;
+    @OneToOne('SubmissionSource', (source: Relation<SubmissionSource>) => source.submission, { onDelete: 'CASCADE' })
+    source: Relation<SubmissionSource>;
 
     public judge(rejudge: boolean = false) {
         judge_submission(this);
@@ -160,9 +160,9 @@ export class SubmissionSource extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne('Submission', { onDelete: 'CASCADE' })
+    @OneToOne('Submission', (submission: Relation<Submission>) => submission.source, { onDelete: 'CASCADE' })
     @JoinColumn()
-    submission: Submission;
+    submission: Relation<Submission>;
 
     @Column({
         type: 'text',

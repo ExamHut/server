@@ -21,7 +21,7 @@ export class User extends BaseEntity {
         length: 256,
     })
     password: string;
-    public PASSWORD_ACTUAL_LENGTH = 64;
+    static PASSWORD_ACTUAL_LENGTH = 64;
 
     @Column({
         length: 128,
@@ -42,8 +42,8 @@ export class User extends BaseEntity {
     @BeforeInsert()
     @BeforeUpdate()
     validatePassword() {
-        if (this.password.length < 8 || this.password.length > this.PASSWORD_ACTUAL_LENGTH) {
-            throw new TypeError("Password must be between 8 and " + this.PASSWORD_ACTUAL_LENGTH + " characters.");
+        if (this.password.length < 8 || this.password.length > User.PASSWORD_ACTUAL_LENGTH) {
+            throw new TypeError("Password must be between 8 and " + User.PASSWORD_ACTUAL_LENGTH + " characters.");
         }
         this.password = User.hashPassword(this.password);
     }
