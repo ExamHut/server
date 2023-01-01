@@ -1,4 +1,4 @@
-import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToMany, ManyToOne, JoinTable, CreateDateColumn, Relation, OneToMany, Unique } from "typeorm";
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToMany, ManyToOne, JoinTable, CreateDateColumn, Relation, OneToMany, Unique, JoinColumn } from "typeorm";
 
 import { Contest, Language, Submission } from "@vulcan/models";
 
@@ -51,6 +51,9 @@ export class Problem extends BaseEntity {
     @JoinTable()
     allowedLanguages: Relation<Language>[];
 
+    @OneToMany('Submission', (submission: Relation<Submission>) => submission.problem, { onDelete: 'CASCADE' })
+    submissions: Promise<Relation<Submission>[]>;
+
     @Column({
         default: false,
     })
@@ -63,6 +66,9 @@ export class Problem extends BaseEntity {
 
     @CreateDateColumn()
     date: Date;
+
+    @OneToMany('ContestProblem', (contest_problem: Relation<ContestProblem>) => contest_problem.problem, { onDelete: 'CASCADE' })
+    contest_problems: Promise<Relation<ContestProblem>[]>;
 }
 
 @Entity()
@@ -74,12 +80,14 @@ export class ContestProblem extends BaseEntity {
     @Column()
     points: number;
 
-    @ManyToOne('Problem')
-    problem: Relation<Problem>;
+    @ManyToOne('Problem', (problem: Relation<Problem>) => problem.contest_problems, { onDelete: 'CASCADE' })
+    @JoinColumn()
+    problem: Promise<Relation<Problem>>;
 
-    @ManyToOne('Contest')
-    contest: Relation<Contest>;
+    @ManyToOne('Contest', (contest: Relation<Contest>) => contest.problems, { onDelete: 'CASCADE' })
+    @JoinColumn()
+    contest: Promise<Relation<Contest>>;
 
-    @OneToMany('Submission', (submission: Relation<Submission>) => submission.problem, { onDelete: 'CASCADE' })
-    submissions: Relation<Submission>[];
+    @OneToMany('Submission', (submission: Relation<Submission>) => submission.contest_problem, { onDelete: 'CASCADE' })
+    submissions: Promise<Relation<Submission>[]>;
 }

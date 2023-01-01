@@ -6,7 +6,12 @@ import { AppDataSource, User } from "@vulcan/models";
 
 export async function login(req: Request, res: Response) {
     const { username, password } = req.body;
-    const user = await User.findOneBy({ username: username });
+    if (!username || !password) {
+        res.status(400).send('Missing username or password');
+        return;
+    }
+
+    const user = await User.findOneByOrFail({ username: username });
 
     if (!user || !user.verifyPassword(password)) {
         res.status(401).send('Invalid username or password');

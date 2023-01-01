@@ -1,6 +1,6 @@
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Unique, OneToOne, JoinColumn, Relation } from "typeorm";
 
-import { Contest, User, Problem, Language, Judge, ContestProblem } from "@vulcan/models";
+import { User, Problem, Language, Judge, ContestProblem, ContestParticipation } from "@vulcan/models";
 import { judge_submission } from "src/judgeapi";
 
 @Entity()
@@ -63,11 +63,19 @@ export class Submission extends BaseEntity {
 
     @ManyToOne('User', { onDelete: 'CASCADE' })
     @JoinColumn()
-    user: Relation<User>;
+    user: Promise<Relation<User>>;
+
+    @ManyToOne('Problem', (problem: Relation<Problem>) => problem.submissions, { onDelete: 'CASCADE' })
+    @JoinColumn()
+    problem: Promise<Relation<Problem>>;
 
     @ManyToOne('ContestProblem', (problem: Relation<ContestProblem>) => problem.submissions, { onDelete: 'CASCADE' })
     @JoinColumn()
-    problem: Relation<ContestProblem>;
+    contest_problem: Promise<Relation<ContestProblem>>;
+
+    @ManyToOne('ContestParticipation', { onDelete: 'CASCADE' })
+    @JoinColumn()
+    participation: Promise<Relation<ContestParticipation>>;
 
     @CreateDateColumn()
     date: Date;
@@ -91,7 +99,7 @@ export class Submission extends BaseEntity {
     points: number;
 
     @ManyToOne('Language', { onDelete: 'CASCADE' })
-    language: Language;
+    language: Promise<Relation<Language>>;
 
     @Column({
         length: 2,
@@ -129,6 +137,11 @@ export class Submission extends BaseEntity {
     })
     case_total: number;
 
+    @Column({
+        default: false,
+    })
+    batch: boolean;
+
     @ManyToOne('Judge', { onDelete: 'SET NULL' })
     judged_on: Judge;
 
@@ -150,10 +163,10 @@ export class Submission extends BaseEntity {
     isPretested: boolean;
 
     @OneToOne('SubmissionSource', (source: Relation<SubmissionSource>) => source.submission, { onDelete: 'CASCADE' })
-    source: Relation<SubmissionSource>;
+    source: Promise<Relation<SubmissionSource>>;
 
-    public judge(rejudge: boolean = false) {
-        judge_submission(this);
+    public async judge(rejudge: boolean = false) {
+        return await judge_submission(this);
     }
 }
 
@@ -164,7 +177,7 @@ export class SubmissionSource extends BaseEntity {
 
     @OneToOne('Submission', (submission: Relation<Submission>) => submission.source, { onDelete: 'CASCADE' })
     @JoinColumn()
-    submission: Relation<Submission>;
+    submission: Promise<Relation<Submission>>;
 
     @Column({
         type: 'text',
@@ -181,7 +194,7 @@ export class SubmissionTestcase extends BaseEntity {
     id: number;
 
     @ManyToOne('Submission', { onDelete: 'CASCADE' })
-    submission: Submission;
+    submission: Promise<Relation<Submission>>;
 
     @Column()
     case: number;
@@ -189,7 +202,7 @@ export class SubmissionTestcase extends BaseEntity {
     @Column({
         length: 3,
     })
-    result: string;
+    status: string;
 
     @Column({
         type: 'float',
