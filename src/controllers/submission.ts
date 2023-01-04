@@ -127,7 +127,7 @@ export async function submit(req: Request, res: Response) {
                 },
                 user: {
                     id: Equal(user.id),
-                }
+                },
             },
         });
 
