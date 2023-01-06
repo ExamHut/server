@@ -39,6 +39,11 @@ export class User extends BaseEntity {
     @JoinTable()
     classes: Class[];
 
+    @Column({
+        default: false,
+    })
+    isAdmin: boolean;
+
     @BeforeInsert()
     @BeforeUpdate()
     validatePassword() {

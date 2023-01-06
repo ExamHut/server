@@ -1,6 +1,7 @@
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, OneToOne, JoinColumn, JoinTable, CreateDateColumn, ManyToMany, Relation } from "typeorm";
 import { IsIP } from "class-validator";
 
+import { LanguageName } from "@uiw/codemirror-extensions-langs";
 import { Problem } from "@vulcan/models";
 
 @Entity()
@@ -35,6 +36,11 @@ export class Language extends BaseEntity {
         default: false,
     })
     fileOnly: boolean;
+
+    @Column({
+        nullable: true,
+    })
+    associatedEditor: LanguageName;
 
     @Column({
         default: 0,

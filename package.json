@@ -8,8 +8,8 @@
     "start": "ts-node --transpile-only src/index.ts",
     "build": "npm run transpile",
     "build:clean": "rimraf dist/ && rimraf .tsbuildinfo && npm run transpile",
-    "dev": "ts-node-dev --respawn --no-notify --prefer-ts -r tsconfig-paths/register --files --rs src/index.ts",
-    "lint": "eslint src --ext .ts",
+    "dev": "ts-node-dev --respawn --watch src --cls --no-notify --prefer-ts -r tsconfig-paths/register --files --rs src/index.ts",
+    "lint": "eslint src --ext .ts,.tsx",
     "test": "jest --passWithNoTests"
   },
   "repository": {
@@ -23,6 +23,12 @@
   },
   "homepage": "https://github.com/Revolutionary-Army-Hideout/server#readme",
   "dependencies": {
+    "@adminjs/design-system": "^3.1.5",
+    "@adminjs/express": "^5.0.1",
+    "@adminjs/typeorm": "^4.0.0",
+    "@uiw/codemirror-extensions-langs": "^4.19.5",
+    "@uiw/react-codemirror": "^4.19.5",
+    "adminjs": "^6.7.4",
     "axios": "^1.2.1",
     "bcrypt": "^5.0.1",
     "class-validator": "^0.13.2",
@@ -62,5 +68,11 @@
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.0.0",
     "typescript": "^4.7.3"
+  },
+  "overrides": {
+    "adminjs": {
+      "flat": "5.0.1"
+    },
+    "core-js": "3.23.3"
   }
 }
