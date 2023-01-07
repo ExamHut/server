@@ -1,47 +1,59 @@
-import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, OneToOne, JoinColumn, JoinTable, CreateDateColumn, ManyToMany, Relation } from "typeorm";
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, OneToOne, JoinColumn, JoinTable, CreateDateColumn, ManyToMany, Relation, RelationId } from "typeorm";
 import { IsIP } from "class-validator";
 
 import { Problem } from "@vulcan/models";
 
 @Entity()
 export class Language extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: 'id',
+    })
     id: number;
 
     @Column({
+        name: 'code',
         length: 10,
         unique: true,
     })
     code: string;
 
     @Column({
+        name: 'name',
         length: 20,
         unique: true,
     })
     name: string;
 
-    @Column()
+    @Column({
+        name: 'short_name',
+    })
     shortName: string;
 
-    @Column()
+    @Column({
+        name: 'common_name',
+    })
     commonName: string;
 
     @Column({
+        name: 'extension',
         length: 10,
     })
     extension: string;
 
     @Column({
+        name: 'file_only',
         default: false,
     })
     fileOnly: boolean;
 
     @Column({
+        name: 'file_size_limit',
         default: 0,
     })
     fileSizeLimit: number;
 
     @Column({
+        name: 'include_in_problem',
         default: false,
     })
     includeInProblem: boolean;
@@ -49,40 +61,50 @@ export class Language extends BaseEntity {
 
 @Entity()
 export class Judge extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: 'id',
+    })
     id: number;
 
     @Column({
+        name: 'name',
         length: 64,
         unique: true,
     })
     name: string;
 
-    @CreateDateColumn()
+    @CreateDateColumn({
+        name: 'created_at',
+    })
     createdAt: Date;
 
     @Column({
+        name: 'is_blocked',
         default: false,
     })
     isBlocked: boolean;
 
     @Column({
+        name: 'auth_key',
         length: 100,
     })
     auth_key: string;
 
     @Column({
+        name: 'online',
         default: false,
     })
     online: boolean;
 
     @Column({
+        name: 'start_time',
         type: 'datetime',
         nullable: true,
     })
     startTime: Date;
 
     @Column({
+        name: 'ping',
         type: 'float',
         precision: 3,
         nullable: true,
@@ -90,6 +112,7 @@ export class Judge extends BaseEntity {
     ping: number;
 
     @Column({
+        name: 'load',
         type: 'float',
         precision: 3,
         nullable: true,
@@ -97,6 +120,7 @@ export class Judge extends BaseEntity {
     load: number;
 
     @Column({
+        name: 'last_ip',
         length: 40,
         nullable: true,
     })
@@ -104,38 +128,69 @@ export class Judge extends BaseEntity {
     lastIP: string;
 
     @ManyToMany('Problem')
-    @JoinTable()
+    @JoinTable({
+        name: 'judge_problem',
+        joinColumn: {
+            name: 'judge_id',
+        },
+        inverseJoinColumn: {
+            name: 'problem_id',
+        },
+    })
     problems: Problem[];
 
     @ManyToMany('Language')
-    @JoinTable()
+    @JoinTable({
+        name: 'judge_language',
+        joinColumn: {
+            name: 'judge_id',
+        },
+        inverseJoinColumn: {
+            name: 'language_id',
+        },
+    })
     runtimes: Language[];
 }
 
 @Entity()
 export class RuntimeVersion extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: 'id',
+    })
     id: number;
 
     @OneToOne('Language')
-    @JoinColumn()
+    @JoinColumn({
+        name: 'language_id',
+    })
     language: Language;
 
+    @RelationId((runtimeVersion: RuntimeVersion) => runtimeVersion.language)
+    languageId: number;
+
     @OneToOne('Judge')
-    @JoinColumn()
+    @JoinColumn({
+        name: 'judge_id',
+    })
     judge: Judge;
 
+    @RelationId((runtimeVersion: RuntimeVersion) => runtimeVersion.judge)
+    judgeId: number;
+
     @Column({
+        name: 'name',
         length: 64,
     })
     name: string;
 
     @Column({
+        name: 'version',
         length: 64,
     })
     version: string;
 
     @Column({
+        name: 'priority',
         default: 0,
     })
     priority: number;
