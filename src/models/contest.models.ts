@@ -1,29 +1,35 @@
-import { Entity, Column, BaseEntity, ManyToOne, PrimaryGeneratedColumn, OneToOne, OneToMany, Relation, Unique, BeforeInsert, BeforeUpdate, CreateDateColumn, JoinColumn } from "typeorm";
+import { Entity, Column, BaseEntity, ManyToOne, PrimaryGeneratedColumn, OneToOne, OneToMany, Relation, Unique, BeforeInsert, BeforeUpdate, CreateDateColumn, JoinColumn, RelationId } from "typeorm";
 
 import { User, Class, Submission, ContestProblem } from "@vulcan/models";
 
 @Entity()
 export class Contest extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: 'id',
+    })
     id: number;
 
     @Column({
+        name: 'code',
         length: 64,
         unique: true,
     })
     code: string;
 
     @Column({
+        name: 'name',
         length: 256,
     })
     name: string;
 
     @Column({
+        name: 'description',
         type: "text",
     })
     description: string;
 
     @Column({
+        name: 'start_date',
         type: "datetime",
     })
     startDate: Date;
@@ -32,17 +38,28 @@ export class Contest extends BaseEntity {
     duration: number;  // In minutes. If < 0 then it will be set to the difference between startDate and endDate.
 
     @Column({
+        name: 'end_date',
         type: "datetime",
     })
     endDate: Date;
 
     @ManyToOne('User')
-    @JoinColumn()
-    author: User;
+    @JoinColumn({
+        name: 'author_id',
+    })
+    author: Promise<Relation<User>>;
+
+    @RelationId((contest: Contest) => contest.author)
+    authorId: number;
 
     @ManyToOne('Class')
-    @JoinColumn()
-    class: Class;
+    @JoinColumn({
+        name: 'class_id',
+    })
+    class: Promise<Relation<Class>>;
+
+    @RelationId((contest: Contest) => contest.class)
+    classId: number;
 
     @OneToMany('ContestProblem', (contestProblem: Relation<ContestProblem>) => contestProblem.contest, { onDelete: 'CASCADE' })
     problems: Promise<Relation<ContestProblem>[]>;
@@ -70,43 +87,64 @@ export class Contest extends BaseEntity {
 
 @Entity()
 export class ContestParticipation extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: 'id',
+    })
     id: number;
 
     @Column({
+        name: 'points',
         type: 'float',
         default: 0,
     })
     points: number;
 
     @Column({
+        name: 'virtual',
         default: 0,
     })
     virtual: number;
     static PARTICIPATION_LIVE = 0;
     static PARTICIPATION_VIRTUAL = 1;
 
-    @Column()
+    @Column({
+        name: 'part_count',
+    })
     part_count: number;
 
     @Column({
+        name: 'disqualified',
         default: false,
     })
     disqualified: boolean;
 
-    @CreateDateColumn()
+    @CreateDateColumn({
+        name: 'participation_date',
+    })
     participationDate: Date;
 
-    @CreateDateColumn()
+    @CreateDateColumn({
+        name: 'end_date',
+    })
     endDate: Date;  // This will be set to the end of the contest based on the duration.
 
     @ManyToOne('User', { cascade: true })
-    @JoinColumn()
+    @JoinColumn({
+        name: 'user_id',
+    })
     user: Promise<Relation<User>>;
 
+    @RelationId((contestParticipation: ContestParticipation) => contestParticipation.user)
+    userId: number;
+
     @ManyToOne('Contest', { cascade: true })
-    @JoinColumn()
+    @JoinColumn({
+        name: 'contest_id',
+    })
     contest: Promise<Relation<Contest>>;
+
+    @RelationId((contestParticipation: ContestParticipation) => contestParticipation.contest)
+    contestId: number;
 
     @BeforeInsert()
     @BeforeUpdate()
