@@ -1,6 +1,6 @@
-import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Unique, OneToOne, JoinColumn } from "typeorm";
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Unique, OneToOne, JoinColumn, Relation, RelationId } from "typeorm";
 
-import { Contest, User, Problem, Language, Judge } from "@vulcan/models";
+import { User, Problem, Language, Judge, ContestProblem, ContestParticipation } from "@vulcan/models";
 import { judge_submission } from "src/judgeapi";
 
 @Entity()
@@ -58,46 +58,86 @@ export class Submission extends BaseEntity {
         'AB': 'Aborted',
     };
 
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: 'id',
+    })
     id: number;
 
     @ManyToOne('User', { onDelete: 'CASCADE' })
-    user: User;
+    @JoinColumn({
+        name: 'user_id',
+    })
+    user: Promise<Relation<User>>;
 
-    @ManyToOne('Problem', { onDelete: 'CASCADE' })
-    problem: Problem;
+    @RelationId((submission: Submission) => submission.user)
+    user_id: number;
 
-    @CreateDateColumn()
+    @ManyToOne('Problem', (problem: Relation<Problem>) => problem.submissions, { onDelete: 'CASCADE' })
+    @JoinColumn({
+        name: 'problem_id',
+    })
+    problem: Promise<Relation<Problem>>;
+
+    @RelationId((submission: Submission) => submission.problem)
+    problem_id: number;
+
+    @ManyToOne('ContestProblem', (problem: Relation<ContestProblem>) => problem.submissions, { onDelete: 'CASCADE' })
+    @JoinColumn({
+        name: 'contest_problem_id',
+    })
+    contest_problem: Promise<Relation<ContestProblem>>;
+
+    @RelationId((submission: Submission) => submission.contest_problem)
+    contest_problem_id: number;
+
+    @ManyToOne('ContestParticipation', { onDelete: 'CASCADE' })
+    @JoinColumn({
+        name: 'contest_participation_id',
+    })
+    participation: Promise<Relation<ContestParticipation>>;
+
+    @RelationId((submission: Submission) => submission.participation)
+    contest_participation_id: number;
+
+    @CreateDateColumn({
+        name: 'date',
+        type: 'datetime',
+    })
     date: Date;
 
     @Column({
+        name: 'time',
         type: 'float',
         nullable: true,
     })
     time: number;
 
     @Column({
+        name: 'memory',
         type: 'float',
         nullable: true,
     })
     memory: number;
 
     @Column({
+        name: 'points',
         type: 'float',
         nullable: true,
     })
     points: number;
 
     @ManyToOne('Language', { onDelete: 'CASCADE' })
-    language: Language;
+    language: Promise<Relation<Language>>;
 
     @Column({
+        name: 'status',
         length: 2,
         default: 'QU',
     })
     status: string;
 
     @Column({
+        name: 'result',
         length: 3,
         default: null,
         nullable: true,
@@ -105,66 +145,93 @@ export class Submission extends BaseEntity {
     result: string;
 
     @Column({
+        name: 'error',
         type: 'text',
         nullable: true,
     })
     error: string;
 
     @Column({
+        name: 'current_testcase',
         default: 0,
     })
     current_testcase: number;
 
     @Column({
+        name: 'case_points',
         type: 'float',
         default: 0,
     })
     case_points: number;
 
     @Column({
+        name: 'case_total',
         type: 'float',
         default: 0,
     })
     case_total: number;
 
+    @Column({
+        name: 'case_score',
+        default: false,
+    })
+    batch: boolean;
+
     @ManyToOne('Judge', { onDelete: 'SET NULL' })
+    @JoinColumn({
+        name: 'judge_id',
+    })
     judged_on: Judge;
 
+    @RelationId((submission: Submission) => submission.judged_on)
+    judge_id: number;
+
     @Column({
+        name: 'judged_date',
         type: 'datetime',
         nullable: true,
     })
     judged_date: Date;
 
     @Column({
+        name: 'rejudged_date',
         type: 'datetime',
         nullable: true,
     })
     rejudged_date: Date;
 
     @Column({
+        name: 'is_pretested',
         default: false,
     })
     isPretested: boolean;
 
-    @OneToOne('SubmissionSource', { onDelete: 'CASCADE' })
-    source: SubmissionSource;
+    @OneToOne('SubmissionSource', (source: Relation<SubmissionSource>) => source.submission, { onDelete: 'CASCADE' })
+    source: Promise<Relation<SubmissionSource>>;
 
-    public judge(rejudge: boolean = false) {
-        judge_submission(this);
+    public async judge(rejudge: boolean = false) {
+        return await judge_submission(this);
     }
 }
 
 @Entity()
 export class SubmissionSource extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: 'id',
+    })
     id: number;
 
-    @OneToOne('Submission', { onDelete: 'CASCADE' })
-    @JoinColumn()
-    submission: Submission;
+    @OneToOne('Submission', (submission: Relation<Submission>) => submission.source, { onDelete: 'CASCADE' })
+    @JoinColumn({
+        name: 'submission_id',
+    })
+    submission: Promise<Relation<Submission>>;
+
+    @RelationId((source: SubmissionSource) => source.submission)
+    submission_id: number;
 
     @Column({
+        name: 'source',
         type: 'text',
     })
     source: string;
@@ -175,58 +242,78 @@ export class SubmissionSource extends BaseEntity {
 export class SubmissionTestcase extends BaseEntity {
     static RESULT = Submission.SUBMISSION_RESULT;
 
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: 'id',
+    })
     id: number;
 
     @ManyToOne('Submission', { onDelete: 'CASCADE' })
-    submission: Submission;
+    @JoinColumn({
+        name: 'submission_id',
+    })
+    submission: Promise<Relation<Submission>>;
 
-    @Column()
+    @RelationId((testcase: SubmissionTestcase) => testcase.submission)
+    submission_id: number;
+
+    @Column({
+        name: 'case',
+    })
     case: number;
 
     @Column({
+        name: 'status',
         length: 3,
     })
-    result: string;
+    status: string;
 
     @Column({
+        name: 'time',
         type: 'float',
         nullable: true,
     })
     time: number;
 
     @Column({
+        name: 'memory',
         type: 'float',
         nullable: true,
     })
     memory: number;
 
     @Column({
+        name: 'points',
         type: 'float',
         nullable: true,
     })
     points: number;
 
     @Column({
+        name: 'total',
         type: 'float',
         nullable: true,
     })
     total: number;
 
     @Column({
+        name: 'batch',
         nullable: true,
     })
     batch: number;
 
-    @Column()
+    @Column({
+        name: 'feedback',
+    })
     feedback: string;
 
     @Column({
+        name: 'extended_feedback',
         type: 'text',
     })
     extended_feedback: string;
 
     @Column({
+        name: 'output',
         type: 'text',
     })
     output: string;

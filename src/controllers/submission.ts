@@ -3,21 +3,23 @@ import fs from "fs";
 import multer from "multer";
 
 import { Request, Response } from 'express';
-import { AppDataSource, Language, Problem, Submission, User } from "@vulcan/models";
-import { SubmissionSource } from 'src/models/submission.models';
+import { Equal } from "typeorm";
+import { AppDataSource, ContestParticipation, ContestProblem, Judge, Language, Problem, Submission, SubmissionSource, User } from "@vulcan/models";
 
 export async function submissionInfo(req: Request, res: Response) {
-    let submission = await Submission.findOne({
-        relations: ["user", "problem"],
+    const submission = await Submission.findOne({
         where: {
             id: Number(req.params.submissionId),
         },
     });
 
+    const problem = await submission.problem;
+    const user = await submission.user;
+
     return res.status(200).json({
         id: submission.id,
-        problem_id: submission.problem.id,
-        user_id: submission.user.id,
+        problem_id: problem.id,
+        user_id: user.id,
         language: submission.language,
         status: submission.status,
         result: submission.result,
@@ -38,7 +40,6 @@ export async function submissionInfo(req: Request, res: Response) {
 
 export async function allSubmissionInfo(req: Request, res: Response) {
     const submissions = await Submission.find({
-        relations: ["user", "problem"],
         where: {
             problem: {
                 id: Number(req.params.problemId),
@@ -46,11 +47,14 @@ export async function allSubmissionInfo(req: Request, res: Response) {
         },
     });
 
-    return res.status(200).json(Array.from(submissions, (submission) => {
+    return res.status(200).json(Array.from(submissions, async (submission: Submission) => {
+        const problem = await submission.problem;
+        const user = await submission.user;
+
         return {
             id: submission.id,
-            problem_id: submission.problem.id,
-            user_id: submission.user.id,
+            problem_id: problem.id,
+            user_id: user.id,
             language: submission.language,
             status: submission.status,
             result: submission.result,
@@ -82,24 +86,62 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }).single('fileonly_submission');
 
 export async function submit(req: Request, res: Response) {
+    // Ensure that there is at least one judge available
+    if ((await Judge.find({ where: { online: true } })).length === 0) {
+        return res.status(400).json({ error: "No judge available." });
+    }
+
     upload(req, res, async (err) => {
         if (err) {
             return res.status(409).json(err);
         }
 
-        const problem = await Problem.findOneBy({ id: Number(req.params.problemId) });
-        const language = await Language.findOneBy({ extension: req.body.language });
+        const contest_problem = await ContestProblem.findOneBy({ id: Equal(Number(req.params.problemId)) });
+        if (!contest_problem) {
+            return res.status(404).json({ error: "Problem not found" });
+        }
+
+        const contest = await contest_problem.contest;
+        const problem = await contest_problem.problem;
+
+        const language = await Language.findOneBy({ code: Equal(req.body.language) });
+        if (!language) {
+            return res.status(400).json({ error: `Unsupported language: ${req.body.language}` });
+        }
+
+        // Ensure that the submission does contains file/source
+        if (!req.body.source && !req.file) {
+            return res.status(400).json({ error: "No source/file found." });
+        }
+
         const user = req.user;
 
+        // Get the participation of the user
+        const participation = await ContestParticipation.findOne({
+            order: {
+                part_count: "DESC",
+            },
+            where: {
+                contest: {
+                    id: Equal(contest.id),
+                },
+                user: {
+                    id: Equal(user.id),
+                },
+            },
+        });
+
         const submission = new Submission();
-        submission.user = user;
-        submission.problem = problem;
+        submission.user = Promise.resolve(user);
+        submission.problem = Promise.resolve(problem);
+        submission.contest_problem = Promise.resolve(contest_problem);
+        submission.participation = Promise.resolve(participation);
         submission.date = new Date();
-        submission.language = language;
+        submission.language = Promise.resolve(language);
         const updatedSubmisison = await submission.save();
 
         const submissionSource = new SubmissionSource();
-        submissionSource.submission = updatedSubmisison;
+        submissionSource.submission = Promise.resolve(updatedSubmisison);
 
         if (language.fileOnly) {
             const split = req.file.filename.split('.');
@@ -112,18 +154,23 @@ export async function submit(req: Request, res: Response) {
             });
             submissionSource.source = newPath;
         } else {
-            submissionSource.source = req.body.source;
+            submissionSource.source = req.body.source.toString('utf8');
         }
 
-        submissionSource.save();
+        await submissionSource.save();
 
-        return res.status(200).end();
+        const success = await submission.judge();
+
+        if (!success) {
+            return res.status(500).json({ error: "Failed to judge submission." });
+        } else {
+            return res.status(200).end();
+        }
     });
 }
 
 export async function source(req: Request, res: Response) {
     const submisisonSource = await SubmissionSource.findOne({
-        relations: ["submission"],
         where: {
             submission: {
                 id: Number(req.params.submissionId),
