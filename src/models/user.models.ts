@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, BeforeInsert, BeforeUpdate, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, BeforeInsert, BeforeUpdate, ManyToMany, JoinTable, Relation } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 @Entity()
@@ -42,7 +42,7 @@ export class User extends BaseEntity {
     })
     refreshToken: string;
 
-    @ManyToMany('Class')
+    @ManyToMany('Class', { eager: true })
     @JoinTable({
         name: 'user_class',
         joinColumn: {
@@ -96,4 +96,7 @@ export class Class extends BaseEntity {
         length: 256,
     })
     name: string;
+
+    @ManyToMany('User', (user: Relation<User>) => user.classes)
+    users: Promise<Relation<User>[]>;
 }

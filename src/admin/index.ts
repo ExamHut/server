@@ -1,15 +1,18 @@
-import { User, Class, Problem, ContestProblem, Submission, Judge, Language, ContestParticipation, RuntimeVersion, Contest } from '@vulcan/models';
 import { AdminJSOptions } from 'adminjs';
 import { componentLoader } from './components';
-import { ResourceSubmissionSource } from './submission.admin';
+import { ResourceUser, ResourceClass } from './custom-resources/user.admin';
+import { ResourceSubmission, ResourceSubmissionSource } from './custom-resources/submission.admin';
+import { ResourceProblem } from './custom-resources/problem.admin';
+import { ResourceContest, ResourceContestProblem, ResourceContestParticipation } from './custom-resources/contest.admin';
+import { ResourceJudge, ResourceLanguage, ResourceRuntimeVersion } from './custom-resources/runtime.admin';
 
 export const adminjsoptions: AdminJSOptions = {
     resources: [
-        User, Class,
-        Problem,
-        Contest, ContestProblem, ContestParticipation,
-        Submission, ResourceSubmissionSource,
-        Judge, Language, RuntimeVersion,
+        ResourceUser, ResourceClass,
+        ResourceProblem,
+        ResourceContest, ResourceContestProblem, ResourceContestParticipation,
+        ResourceSubmission, ResourceSubmissionSource,
+        ResourceJudge, ResourceLanguage, ResourceRuntimeVersion,
     ],
     rootPath: '/admin',
     componentLoader: componentLoader,

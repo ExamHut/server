@@ -58,7 +58,7 @@ export class Problem extends BaseEntity {
     })
     partial: boolean;
 
-    @ManyToMany('Language')
+    @ManyToMany('Language', { eager: true })
     @JoinTable({
         name: 'problem_language',
         joinColumn: {

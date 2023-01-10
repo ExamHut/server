@@ -6,14 +6,15 @@ import morgan from 'morgan';
 import { AppDataSource, User } from "@vulcan/models";
 import { router } from '@vulcan/routes';
 import * as AdminJSExpress from '@adminjs/express';
-import { Database, Resource } from '@adminjs/typeorm';
+import { Database } from '@adminjs/typeorm';
 import { validate } from 'class-validator';
 import AdminJS from 'adminjs';
 
 import { adminjsoptions } from './admin';
+import { CustomResource } from './admin/resource';
 
-AdminJS.registerAdapter({ Database, Resource });
-Resource.validate = validate;
+AdminJS.registerAdapter({ Database, Resource: CustomResource });
+CustomResource.validate = validate;
 
 export const app = express();
 
