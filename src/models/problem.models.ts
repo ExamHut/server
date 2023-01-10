@@ -114,6 +114,7 @@ export class ContestProblem extends BaseEntity {
     problem: Promise<Relation<Problem>>;
 
     @RelationId((contest_problem: ContestProblem) => contest_problem.problem)
+    @Column({ name: 'problem_id' })
     problemId: number;
 
     @ManyToOne('Contest', (contest: Relation<Contest>) => contest.problems, { onDelete: 'CASCADE' })
@@ -123,6 +124,7 @@ export class ContestProblem extends BaseEntity {
     contest: Promise<Relation<Contest>>;
 
     @RelationId((contest_problem: ContestProblem) => contest_problem.contest)
+    @Column({ name: 'contest_id' })
     contestId: number;
 
     @OneToMany('Submission', (submission: Relation<Submission>) => submission.contest_problem, { onDelete: 'CASCADE' })

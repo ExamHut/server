@@ -167,6 +167,7 @@ export class RuntimeVersion extends BaseEntity {
     language: Language;
 
     @RelationId((runtimeVersion: RuntimeVersion) => runtimeVersion.language)
+    @Column({ name: 'language_id' })
     languageId: number;
 
     @OneToOne('Judge')
@@ -176,6 +177,7 @@ export class RuntimeVersion extends BaseEntity {
     judge: Judge;
 
     @RelationId((runtimeVersion: RuntimeVersion) => runtimeVersion.judge)
+    @Column({ name: 'judge_id' })
     judgeId: number;
 
     @Column({

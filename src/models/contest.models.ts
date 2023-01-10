@@ -50,6 +50,7 @@ export class Contest extends BaseEntity {
     author: Promise<Relation<User>>;
 
     @RelationId((contest: Contest) => contest.author)
+    @Column({ name: 'author_id' })
     authorId: number;
 
     @ManyToOne('Class')
@@ -59,6 +60,7 @@ export class Contest extends BaseEntity {
     class: Promise<Relation<Class>>;
 
     @RelationId((contest: Contest) => contest.class)
+    @Column({ name: 'class_id' })
     classId: number;
 
     @OneToMany('ContestProblem', (contestProblem: Relation<ContestProblem>) => contestProblem.contest, { onDelete: 'CASCADE' })
@@ -135,6 +137,7 @@ export class ContestParticipation extends BaseEntity {
     user: Promise<Relation<User>>;
 
     @RelationId((contestParticipation: ContestParticipation) => contestParticipation.user)
+    @Column({ name: 'user_id' })
     userId: number;
 
     @ManyToOne('Contest', { cascade: true })
@@ -144,6 +147,7 @@ export class ContestParticipation extends BaseEntity {
     contest: Promise<Relation<Contest>>;
 
     @RelationId((contestParticipation: ContestParticipation) => contestParticipation.contest)
+    @Column({ name: 'contest_id' })
     contestId: number;
 
     @BeforeInsert()

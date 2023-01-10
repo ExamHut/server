@@ -70,6 +70,7 @@ export class Submission extends BaseEntity {
     user: Promise<Relation<User>>;
 
     @RelationId((submission: Submission) => submission.user)
+    @Column({ name: 'user_id' })
     user_id: number;
 
     @ManyToOne('Problem', (problem: Relation<Problem>) => problem.submissions, { onDelete: 'CASCADE' })
@@ -79,6 +80,7 @@ export class Submission extends BaseEntity {
     problem: Promise<Relation<Problem>>;
 
     @RelationId((submission: Submission) => submission.problem)
+    @Column({ name: 'problem_id' })
     problem_id: number;
 
     @ManyToOne('ContestProblem', (problem: Relation<ContestProblem>) => problem.submissions, { onDelete: 'CASCADE' })
@@ -88,6 +90,7 @@ export class Submission extends BaseEntity {
     contest_problem: Promise<Relation<ContestProblem>>;
 
     @RelationId((submission: Submission) => submission.contest_problem)
+    @Column({ name: 'contest_problem_id' })
     contest_problem_id: number;
 
     @ManyToOne('ContestParticipation', { onDelete: 'CASCADE' })
@@ -97,6 +100,7 @@ export class Submission extends BaseEntity {
     participation: Promise<Relation<ContestParticipation>>;
 
     @RelationId((submission: Submission) => submission.participation)
+    @Column({ name: 'contest_participation_id' })
     contest_participation_id: number;
 
     @CreateDateColumn({
@@ -184,6 +188,7 @@ export class Submission extends BaseEntity {
     judged_on: Judge;
 
     @RelationId((submission: Submission) => submission.judged_on)
+    @Column({ name: 'judge_id', nullable: true })
     judge_id: number;
 
     @Column({
@@ -228,6 +233,7 @@ export class SubmissionSource extends BaseEntity {
     submission: Promise<Relation<Submission>>;
 
     @RelationId((source: SubmissionSource) => source.submission)
+    @Column({ name: 'submission_id' })
     submission_id: number;
 
     @Column({
@@ -254,6 +260,7 @@ export class SubmissionTestcase extends BaseEntity {
     submission: Promise<Relation<Submission>>;
 
     @RelationId((testcase: SubmissionTestcase) => testcase.submission)
+    @Column({ name: 'submission_id' })
     submission_id: number;
 
     @Column({
