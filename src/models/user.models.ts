@@ -79,10 +79,10 @@ export class User extends BaseEntity {
 
 @Entity()
 export class Class extends BaseEntity {
-    @PrimaryGeneratedColumn({
+    @PrimaryGeneratedColumn('uuid', {
         name: 'id',
     })
-    id: number;
+    id: string;
 
     @Column({
         name: 'code',

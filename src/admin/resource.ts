@@ -12,7 +12,10 @@ export class CustomResource extends TypeOrmResource {
         );
     }
 
-    async saveRecords(record: RecordJSON, resourceId: string | number, ids: { id: string | number }[]) {
+    async findRelated(record: BaseRecord, resource: CustomResource, options = {}) {
+    }
+
+    async saveRecords(record: RecordJSON, resourceId: string, ids: { id: string | number }[]) {
         await this.update(record.params.id, {
             [resourceId]: ids.map((value) => ({ id: value.id })),
         });
