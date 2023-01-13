@@ -120,13 +120,17 @@ export class ContestParticipation extends BaseEntity {
     })
     disqualified: boolean;
 
-    @CreateDateColumn({
+    @Column({
         name: 'participation_date',
+        type: 'datetime',
+        default: () => 'NOW()',
     })
     participationDate: Date;
 
-    @CreateDateColumn({
+    @Column({
         name: 'end_date',
+        type: 'datetime',
+        default: () => 'NOW()',
     })
     endDate: Date;  // This will be set to the end of the contest based on the duration.
 

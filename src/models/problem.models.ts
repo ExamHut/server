@@ -85,8 +85,10 @@ export class Problem extends BaseEntity {
     })
     isManuallyManaged: boolean;
 
-    @CreateDateColumn({
+    @Column({
         name: 'date',
+        type: 'datetime',
+        default: () => 'NOW()',
     })
     date: Date;
 

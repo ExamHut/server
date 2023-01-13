@@ -74,8 +74,10 @@ export class Judge extends BaseEntity {
     })
     name: string;
 
-    @CreateDateColumn({
+    @Column({
         name: 'created_at',
+        type: 'datetime',
+        default: () => 'NOW()',
     })
     createdAt: Date;
 

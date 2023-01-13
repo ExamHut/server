@@ -103,9 +103,10 @@ export class Submission extends BaseEntity {
     @Column({ name: 'contest_participation_id' })
     contest_participation_id: number;
 
-    @CreateDateColumn({
+    @Column({
         name: 'date',
         type: 'datetime',
+        default: () => 'NOW()',
     })
     date: Date;
 
