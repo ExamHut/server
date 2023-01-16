@@ -1,6 +1,18 @@
-import { Entity, Column, BaseEntity, ManyToOne, PrimaryGeneratedColumn, OneToOne, OneToMany, Relation, Unique, BeforeInsert, BeforeUpdate, CreateDateColumn, JoinColumn, RelationId } from "typeorm";
+import {
+    Entity,
+    Column,
+    BaseEntity,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    OneToMany,
+    Relation,
+    BeforeInsert,
+    BeforeUpdate,
+    JoinColumn,
+    RelationId,
+} from "typeorm";
 
-import { User, Class, Submission, ContestProblem } from "@vulcan/models";
+import { User, Class, ContestProblem } from "@vulcan/models";
 
 @Entity()
 export class Contest extends BaseEntity {
@@ -70,7 +82,7 @@ export class Contest extends BaseEntity {
     @BeforeUpdate()
     validateDuration() {
         if (this.duration <= 0) {
-            this.duration = Math.floor((this.endDate.getTime() - this.startDate.getTime()) / 60);
+            this.duration = Math.floor((this.endDate.getTime() - this.startDate.getTime())) / 60 / 1000;
         }
     }
 
@@ -83,8 +95,13 @@ export class Contest extends BaseEntity {
     }
 
     timeLeft(): number {
-        return Math.abs(this.endDate.getTime() - new Date().getTime());
+        return Math.floor((this.endDate.getTime() - new Date().getTime()) / 60);
     }
+
+    public get over() : boolean {
+        return this.timeLeft() <= 0;
+    }
+
 }
 
 @Entity()
@@ -111,6 +128,7 @@ export class ContestParticipation extends BaseEntity {
 
     @Column({
         name: 'part_count',
+        default: 0,
     })
     part_count: number;
 
@@ -123,14 +141,12 @@ export class ContestParticipation extends BaseEntity {
     @Column({
         name: 'participation_date',
         type: 'datetime',
-        default: () => 'NOW()',
     })
     participationDate: Date;
 
     @Column({
         name: 'end_date',
         type: 'datetime',
-        default: () => 'NOW()',
     })
     endDate: Date;  // This will be set to the end of the contest based on the duration.
 
@@ -153,20 +169,4 @@ export class ContestParticipation extends BaseEntity {
     @RelationId((contestParticipation: ContestParticipation) => contestParticipation.contest)
     @Column({ name: 'contest_id' })
     contestId: number;
-
-    @BeforeInsert()
-    @BeforeUpdate()
-    async autoSetDuration() {
-        if (this.virtual === ContestParticipation.PARTICIPATION_VIRTUAL) {
-            this.endDate = new Date(this.participationDate.getTime() + (await this.contest).duration * 60000);
-        } else {
-            this.endDate = (await this.contest).endDate;
-        }
-    }
-
-    @BeforeInsert()
-    @BeforeUpdate()
-    async autoSetPartCount() {
-        this.part_count = (await ContestParticipation.find({ where: { user: { id: (await this.user).id }, contest: { id: (await this.contest).id } } })).length + 1;
-    }
 }

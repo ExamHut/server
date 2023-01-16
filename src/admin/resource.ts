@@ -34,9 +34,6 @@ export class CustomResource extends TypeOrmResource {
         .map((p) => p.reference());
     }
 
-    // async findRelated(record, resource: CustomResource, options = {}) {
-    // }
-
     getManyProperties() {
         return this.decorate()
         .getProperties({ where: 'edit' })
