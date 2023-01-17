@@ -1,6 +1,3 @@
-// import { RecordJSON, PropertyJSON } from '../../../interfaces';
-// import { flat } from '../../../../utils';
-// import { convertToSubProperty } from './convert-to-sub-property';
 import { Section } from '@adminjs/design-system';
 import { ValueGroup, ButtonGroup } from '@adminjs/design-system';
 import {
@@ -46,7 +43,6 @@ export default class ManyToManyShow extends React.PureComponent<Props> {
             <>
                 <ValueGroup label={property.label}>
                     {(items || []).map((item: any, i: any) => {
-                        // const itemProperty = convertToSubProperty(property, i);
                         return (
                             <ReferenceValue
                             key={i}
@@ -56,19 +52,6 @@ export default class ManyToManyShow extends React.PureComponent<Props> {
                             />
                         );
                     })}
-
-                    {/*<Section> {(items || []).map((item, i) => {
-                        const itemProperty = convertToSubProperty(property, i);
-                        return (
-                            <ItemComponent
-                            {...this.props}
-                            key={itemProperty.path}
-                            property={itemProperty}
-                            />
-                            );
-                        })}
-                        </Section>
-                    */}
                 </ValueGroup>
             </>
         );
