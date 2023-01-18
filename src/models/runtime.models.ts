@@ -1,6 +1,7 @@
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, OneToOne, JoinColumn, JoinTable, CreateDateColumn, ManyToMany, Relation, RelationId } from "typeorm";
 import { IsIP } from "class-validator";
 
+import { LanguageName } from "@uiw/codemirror-extensions-langs";
 import { Problem } from "@vulcan/models";
 
 @Entity()
@@ -73,8 +74,10 @@ export class Judge extends BaseEntity {
     })
     name: string;
 
-    @CreateDateColumn({
+    @Column({
         name: 'created_at',
+        type: 'datetime',
+        default: () => 'NOW()',
     })
     createdAt: Date;
 
@@ -166,6 +169,7 @@ export class RuntimeVersion extends BaseEntity {
     language: Language;
 
     @RelationId((runtimeVersion: RuntimeVersion) => runtimeVersion.language)
+    @Column({ name: 'language_id' })
     languageId: number;
 
     @OneToOne('Judge')
@@ -175,6 +179,7 @@ export class RuntimeVersion extends BaseEntity {
     judge: Judge;
 
     @RelationId((runtimeVersion: RuntimeVersion) => runtimeVersion.judge)
+    @Column({ name: 'judge_id' })
     judgeId: number;
 
     @Column({

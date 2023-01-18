@@ -1,6 +1,18 @@
-import { Entity, Column, BaseEntity, ManyToOne, PrimaryGeneratedColumn, OneToOne, OneToMany, Relation, Unique, BeforeInsert, BeforeUpdate, CreateDateColumn, JoinColumn, RelationId } from "typeorm";
+import {
+    Entity,
+    Column,
+    BaseEntity,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    OneToMany,
+    Relation,
+    BeforeInsert,
+    BeforeUpdate,
+    JoinColumn,
+    RelationId,
+} from "typeorm";
 
-import { User, Class, Submission, ContestProblem } from "@vulcan/models";
+import { User, Class, ContestProblem } from "@vulcan/models";
 
 @Entity()
 export class Contest extends BaseEntity {
@@ -34,9 +46,7 @@ export class Contest extends BaseEntity {
     })
     startDate: Date;
 
-    @Column({
-        name: 'duration',
-    })
+    @Column()
     duration: number;  // In minutes. If < 0 then it will be set to the difference between startDate and endDate.
 
     @Column({
@@ -52,6 +62,7 @@ export class Contest extends BaseEntity {
     author: Promise<Relation<User>>;
 
     @RelationId((contest: Contest) => contest.author)
+    @Column({ name: 'author_id' })
     authorId: number;
 
     @ManyToOne('Class')
@@ -61,6 +72,7 @@ export class Contest extends BaseEntity {
     class: Promise<Relation<Class>>;
 
     @RelationId((contest: Contest) => contest.class)
+    @Column({ name: 'class_id' })
     classId: number;
 
     @OneToMany('ContestProblem', (contestProblem: Relation<ContestProblem>) => contestProblem.contest, { onDelete: 'CASCADE' })
@@ -70,7 +82,7 @@ export class Contest extends BaseEntity {
     @BeforeUpdate()
     validateDuration() {
         if (this.duration <= 0) {
-            this.duration = Math.floor((this.endDate.getTime() - this.startDate.getTime()) / 60);
+            this.duration = Math.floor((this.endDate.getTime() - this.startDate.getTime())) / 60 / 1000;
         }
     }
 
@@ -83,8 +95,13 @@ export class Contest extends BaseEntity {
     }
 
     timeLeft(): number {
-        return Math.abs(this.endDate.getTime() - new Date().getTime());
+        return Math.floor((this.endDate.getTime() - new Date().getTime()) / 60);
     }
+
+    public get over() : boolean {
+        return this.timeLeft() <= 0;
+    }
+
 }
 
 @Entity()
@@ -111,6 +128,7 @@ export class ContestParticipation extends BaseEntity {
 
     @Column({
         name: 'part_count',
+        default: 0,
     })
     part_count: number;
 
@@ -120,13 +138,15 @@ export class ContestParticipation extends BaseEntity {
     })
     disqualified: boolean;
 
-    @CreateDateColumn({
+    @Column({
         name: 'participation_date',
+        type: 'datetime',
     })
     participationDate: Date;
 
-    @CreateDateColumn({
+    @Column({
         name: 'end_date',
+        type: 'datetime',
     })
     endDate: Date;  // This will be set to the end of the contest based on the duration.
 
@@ -137,6 +157,7 @@ export class ContestParticipation extends BaseEntity {
     user: Promise<Relation<User>>;
 
     @RelationId((contestParticipation: ContestParticipation) => contestParticipation.user)
+    @Column({ name: 'user_id' })
     userId: number;
 
     @ManyToOne('Contest', { cascade: true })
@@ -146,21 +167,6 @@ export class ContestParticipation extends BaseEntity {
     contest: Promise<Relation<Contest>>;
 
     @RelationId((contestParticipation: ContestParticipation) => contestParticipation.contest)
+    @Column({ name: 'contest_id' })
     contestId: number;
-
-    @BeforeInsert()
-    @BeforeUpdate()
-    async autoSetDuration() {
-        if (this.virtual === ContestParticipation.PARTICIPATION_VIRTUAL) {
-            this.endDate = new Date(this.participationDate.getTime() + (await this.contest).duration * 60000);
-        } else {
-            this.endDate = (await this.contest).endDate;
-        }
-    }
-
-    @BeforeInsert()
-    @BeforeUpdate()
-    async autoSetPartCount() {
-        this.part_count = (await ContestParticipation.find({ where: { user: { id: (await this.user).id }, contest: { id: (await this.contest).id } } })).length + 1;
-    }
 }

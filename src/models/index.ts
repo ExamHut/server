@@ -1,6 +1,10 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { User } from './user.models';
+
+import {
+    ContestSubscriber,
+    ContestParticipationSubscriber,
+} from "./subscribers/contest.subscribers";
 
 export const AppDataSource = new DataSource({
     type: "mysql",
@@ -13,7 +17,7 @@ export const AppDataSource = new DataSource({
     logging: false,
     entities: [__dirname + "/**/*.models.ts"],
     migrations: [],
-    subscribers: [],
+    subscribers: [ContestSubscriber, ContestParticipationSubscriber],
 });
 
 export { User, Class } from './user.models';
