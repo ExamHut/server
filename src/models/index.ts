@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
+import Redis from "ioredis";
 
 import {
     ContestSubscriber,
@@ -21,6 +22,14 @@ export const AppDataSource = new DataSource({
     cache: {
         type: "ioredis",
     },
+});
+
+export const RedisCache = new Redis({
+    host: process.env.REDIS_HOST,
+    port: parseInt(process.env.REDIS_PORT),
+    password: process.env.REDIS_PASSWORD,
+    username: process.env.REDIS_USERNAME,
+    db: parseInt(process.env.REDIS_DB),
 });
 
 export { User, Class } from './user.models';
