@@ -18,6 +18,9 @@ export const AppDataSource = new DataSource({
     entities: [__dirname + "/**/*.models.ts"],
     migrations: [],
     subscribers: [ContestSubscriber, ContestParticipationSubscriber],
+    cache: {
+        type: "ioredis",
+    },
 });
 
 export { User, Class } from './user.models';
