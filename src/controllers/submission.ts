@@ -138,6 +138,7 @@ export async function submit(req: Request, res: Response) {
         submission.participation = Promise.resolve(participation);
         submission.date = new Date();
         submission.language = Promise.resolve(language);
+        submission.isPretested = contest_problem.isPretested;
         const updatedSubmisison = await submission.save();
 
         const submissionSource = new SubmissionSource();
