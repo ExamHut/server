@@ -206,6 +206,12 @@ export class Submission extends BaseEntity {
     })
     rejudged_date: Date;
 
+    @Column({
+        name: 'is_pretested',
+        default: false,
+    })
+    isPretested: boolean;
+
     @OneToOne('SubmissionSource', (source: Relation<SubmissionSource>) => source.submission, { onDelete: 'CASCADE' })
     source: Promise<Relation<SubmissionSource>>;
 
