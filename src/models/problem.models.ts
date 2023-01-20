@@ -131,4 +131,10 @@ export class ContestProblem extends BaseEntity {
 
     @OneToMany('Submission', (submission: Relation<Submission>) => submission.contest_problem, { onDelete: 'CASCADE' })
     submissions: Promise<Relation<Submission>[]>;
+
+    @Column({
+        name: 'is_pretested',
+        default: false,
+    })
+    isPretested: boolean;
 }
