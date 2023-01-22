@@ -1,4 +1,4 @@
-import { Contest, ContestParticipation, ContestProblem, Submission } from "@vulcan/models";
+import { AppDataSource, Contest, ContestParticipation, ContestProblem, Submission } from "@vulcan/models";
 import { BaseContestFormat } from "./base";
 
 export class LegacyIOIContestFormat extends BaseContestFormat {
@@ -32,16 +32,23 @@ export class LegacyIOIContestFormat extends BaseContestFormat {
     }
 
     async update_participation(participation: ContestParticipation) {
-        const submissions = await Submission.find({
-            select: {
-                contest_problem_id: true,
-                points: true,
-                date: true,
-            },
-            where: {
-                contest_participation_id: participation.id,
-            },
-        }).then(_ => _);
+        const query = AppDataSource
+            .getRepository(Submission)
+            .createQueryBuilder()
+            .select(['contest_problem_id', 'points'])
+            .addSelect('MIN(date)', 'date')
+            .where('contest_participation_id = :id', { id: participation.id })
+            .andWhere(qb => {
+                const subquery = qb.subQuery()
+                    .select('points')
+                    .from(Submission, 'submission')
+                    .where('contest_participation_id = :id', { id: participation.id })
+                    .orderBy('points', 'DESC')
+                    .limit(1);
+                return `points = ${subquery.getQuery()}`;
+            });
+
+        const submissions = await query.getRawMany();
 
         let last_submission_time = 0;
         let total_time = 0;
@@ -79,6 +86,7 @@ export class LegacyIOIContestFormat extends BaseContestFormat {
         participation.format_data = format_data;
         participation.save();
     }
+
     display_user_problem(participation: ContestParticipation, contest_problem: ContestProblem, frozen: boolean) {
         if (!participation.format_data) return {};
 
