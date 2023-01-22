@@ -123,7 +123,7 @@ export class LegacyIOIContestFormat extends BaseContestFormat {
         };
     }
 
-    *get_short_form_display() {
+    *get_short_form_display(): Generator<string> {
         yield 'The maximum score submission for each problem will be used.';
 
         if (this.config.last_score_altering) {

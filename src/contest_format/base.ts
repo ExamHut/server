@@ -19,7 +19,7 @@ export abstract class BaseContestFormat {
 
     abstract display_user_problem(participation: ContestParticipation, contest_problem: ContestProblem, frozen: boolean): Object;
 
-    abstract display_participation_result(participation: ContestParticipation, frozen: boolean): any;
+    abstract display_participation_result(participation: ContestParticipation, frozen: boolean): Object;
 
     abstract get_short_form_display(): Generator<string>;
 
@@ -32,12 +32,12 @@ export abstract class BaseContestFormat {
         });
     }
 
-    get_label_for_problem(index: number): string {
+    get_label_for_problem(index: number) {
         return (index + 1).toString();
     }
 
 
-    best_solution_state(points: number, total: number): string {
+    best_solution_state(points: number, total: number) {
         if (!points) {
             return "failed-score";
         }
