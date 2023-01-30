@@ -13,7 +13,6 @@ type ContestConfigValidator = {
     penalty?: Function,
 }
 
-type FormatProblemData = {
-    points: number,
-    time: number,
+type FormatData = {
+    [key: string]: any
 }

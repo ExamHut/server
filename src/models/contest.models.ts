@@ -178,6 +178,6 @@ export class ContestParticipation extends BaseEntity {
 
     // Optional
     total_time?: number;
-    format_data?: Map<number, FormatProblemData>;
+    format_data?: FormatData;
     tiebreaker?: number;
 }

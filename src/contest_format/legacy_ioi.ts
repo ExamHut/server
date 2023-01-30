@@ -53,7 +53,7 @@ export class LegacyIOIContestFormat extends BaseContestFormat {
         let last_submission_time = 0;
         let total_time = 0;
         let total_points = 0;
-        let format_data = new Map<number, FormatProblemData>();
+        let format_data: FormatData = {};
 
         for (const { contest_problem_id, points, date } of submissions) {
             let time = 0;
@@ -71,10 +71,10 @@ export class LegacyIOIContestFormat extends BaseContestFormat {
 
             total_points += points;
 
-            format_data.set(contest_problem_id, {
+            format_data[contest_problem_id] = {
                 points: points,
                 time: time,
-            });
+            };
         }
 
         participation.total_time = this.config.cumtime
@@ -90,7 +90,7 @@ export class LegacyIOIContestFormat extends BaseContestFormat {
     display_user_problem(participation: ContestParticipation, contest_problem: ContestProblem, frozen: boolean) {
         if (!participation.format_data) return {};
 
-        const problem_data = participation.format_data.get(contest_problem.id);
+        const problem_data = participation.format_data[contest_problem.id];
         if (!problem_data) return {};
 
         const is_pretested = contest_problem.isPretested && this.contest.isPretested;
