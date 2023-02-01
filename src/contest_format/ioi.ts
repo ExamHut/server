@@ -1,10 +1,18 @@
-import { AppDataSource, ContestParticipation, ContestProblem, Submission, SubmissionTestcase } from "@vulcan/models";
+import { AppDataSource, Contest, ContestParticipation } from "@vulcan/models";
 import { LegacyIOIContestFormat } from "./legacy_ioi";
 
 export class IOIContestFormat extends LegacyIOIContestFormat {
     static config_default: ContestConfig = {
         'cumtime': false,
     };
+
+    constructor(contest: Contest, config: ContestConfig) {
+        super(contest, config);
+        if (!config) config = {};
+
+        this.config = { ...IOIContestFormat.config_default, ...config };
+        this.contest = contest;
+    }
 
     get name() {
         return 'IOI';
