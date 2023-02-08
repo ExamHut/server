@@ -1,32 +1,35 @@
 import net from 'net';
 import * as zlib from 'zlib';
 
-import { SocketClientTCP } from 'netlinkwrapper';
 import { pack, unpack } from 'python-struct';
 import { Submission, SubmissionTestcase } from '@vulcan/models';
-import { Equal, In, Not } from 'typeorm';
+import { In, Not } from 'typeorm';
 
 
-export function judge_request(packet: object, reply: boolean = true) {
-    const sock = new SocketClientTCP(Number(process.env.BRIDGE_PORT), process.env.BRIDGE_HOST);
+export function judge_request(packet: object, reply: boolean = true, callback: Function = () => {}) {
+    const sock = net.createConnection({
+        host: process.env.BRIDGE_HOST,
+        port: Number(process.env.BRIDGE_PORT),
+    });
 
     const output = JSON.stringify(packet);
     const deflatedOuput = zlib.deflateSync(output);
     const tag = pack('!I', deflatedOuput.length);
-    sock.send(tag);
-    sock.send(deflatedOuput);
+    sock.connect(Number(process.env.BRIDGE_PORT), process.env.BRIDGE_HOST, () => {
+            sock.write(tag);
+            sock.write(deflatedOuput);
+        }
+    );
 
     if (reply) {
-        const buffer = sock.receive();
-        const tag = Number(unpack('!I', buffer.subarray(0, 4))[0]);
-        const deflatedInput = buffer.subarray(4, 4 + tag);
-        const input = zlib.inflateSync(deflatedInput);
-        const data = JSON.parse(input.toString());
-        sock.disconnect();
-        return data;
-    } else {
-        sock.disconnect();
-        return;
+        sock.on('data', (buffer) => {
+            const tag = Number(unpack('!I', buffer.subarray(0, 4))[0]);
+            const deflatedInput = buffer.subarray(4, 4 + tag);
+            const input = zlib.inflateSync(deflatedInput);
+            const data = JSON.parse(input.toString());
+            sock.destroy();
+            callback(data);
+        });
     }
 }
 
@@ -62,14 +65,13 @@ export async function judge_submission(
             'judge-id': judge_id,
             'banned-judges': [],  // TODO: Implement banned judges
             'priority': Number(batch_rejudge ? process.env.BATCH_REJUDGE_PRIORITY : (rejudge ? process.env.REJUDGE_PRIORITY : process.env.CONTEST_SUBMISSION_PRIORITY)),
+        }, true, (response: any) => {
+            if (response['name'] !== 'submission-received' || response['submission-id'] !== submission.id) {
+                submission.status = 'IE';
+                submission.result = 'IE';
+                submission.save();
+            }
         });
-
-        if (response['name'] !== 'submission-received' || response['submission-id'] !== submission.id) {
-            submission.status = 'IE';
-            submission.result = 'IE';
-            await submission.save();
-        }
-
         return true;
     } catch (e) {
         console.log(e);
