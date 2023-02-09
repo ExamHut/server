@@ -34,7 +34,7 @@ export async function submissionInfo(req: Request, res: Response) {
         judged_on: submission.judged_on,
         judged_date: submission.judged_date,
         rejudged_date: submission.rejudged_date,
-        is_pretested: submission.isPretested,
+        is_pretested: (await submission.contest_problem).isPretested,
     });
 }
 
@@ -69,7 +69,7 @@ export async function allSubmissionInfo(req: Request, res: Response) {
             judged_on: submission.judged_on,
             judged_date: submission.judged_date,
             rejudged_date: submission.rejudged_date,
-            is_pretested: submission.isPretested,
+            is_pretested: (await submission.contest_problem).isPretested,
         };
     }));
 }
@@ -138,6 +138,7 @@ export async function submit(req: Request, res: Response) {
         submission.participation = Promise.resolve(participation);
         submission.date = new Date();
         submission.language = Promise.resolve(language);
+        submission.isPretested = contest_problem.isPretested;
         const updatedSubmisison = await submission.save();
 
         const submissionSource = new SubmissionSource();

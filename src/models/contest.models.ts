@@ -78,6 +78,12 @@ export class Contest extends BaseEntity {
     @OneToMany('ContestProblem', (contestProblem: Relation<ContestProblem>) => contestProblem.contest, { onDelete: 'CASCADE' })
     problems: Promise<Relation<ContestProblem>[]>;
 
+    @Column({
+        name: 'is_pretested',
+        default: false,
+    })
+    isPretested: boolean;
+
     @BeforeInsert()
     @BeforeUpdate()
     validateDuration() {
@@ -169,4 +175,9 @@ export class ContestParticipation extends BaseEntity {
     @RelationId((contestParticipation: ContestParticipation) => contestParticipation.contest)
     @Column({ name: 'contest_id' })
     contestId: number;
+
+    // Optional
+    total_time?: number;
+    format_data?: FormatData;
+    tiebreaker?: number;
 }
